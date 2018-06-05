@@ -1,0 +1,132 @@
+plugins {
+    id 'base'
+    id 'maven-publish'
+}
+
+publishing {
+    repositories {
+        maven {
+            url "${System.getProperty('user.home')}/releases/maven/development"
+        }
+        maven {
+            url "${System.getProperty('user.home')}/releases/maven/release"
+        }
+    }
+}
+
+def allOutputsFolder = file("$buildDir/allOutputs")
+
+task copyAllOutputs(type: Copy) {
+    destinationDir allOutputsFolder
+}
+
+build.dependsOn copyAllOutputs
+
+ext.addTaskToCopyAllOutputs = { task ->
+    copyAllOutputs.dependsOn task
+    copyAllOutputs.inputs.file task.archivePath
+    copyAllOutputs.from task.archivePath
+}
+
+def pubVersion = '2018.17.0'
+
+def baseArtifactId = 'ni-libraries'
+def artifactGroupId = 'edu.wpi.first.ni-libraries'
+def zipBaseName = '_GROUP_edu_wpi_first_ni-libraries_ID_ni-libraries_CLS'
+
+def outputsFolder = file("$project.buildDir/outputs")
+
+def versionFile = file("$outputsFolder/version.txt")
+
+task outputVersions() {
+    description = 'Prints the versions of this to a file for use by the downstream packaging project'
+    group = 'Build'
+    outputs.files(versionFile)
+
+    doFirst {
+        buildDir.mkdir()
+        outputsFolder.mkdir()
+    }
+
+    doLast {
+        versionFile.write pubVersion
+    }
+}
+
+build.dependsOn outputVersions
+copyAllOutputs.dependsOn outputVersions
+copyAllOutputs.inputs.file versionFile
+copyAllOutputs.from versionFile
+
+task libZip(type: Zip) {
+    destinationDir = outputsFolder
+    baseName = zipBaseName
+    classifier = "linuxathena"
+
+    from('src/lib') {
+        into '/linux/athena/shared/'
+    }
+}
+
+task headersZip(type: Zip) {
+    destinationDir = outputsFolder
+    baseName = zipBaseName
+    classifier = "headers"
+
+    from('src/include') {
+        into '/'
+    }
+}
+
+build.dependsOn headersZip
+build.dependsOn libZip
+
+addTaskToCopyAllOutputs(headersZip)
+addTaskToCopyAllOutputs(libZip)
+
+task patchNiLibraries() {
+    doLast {
+        // Patch ChipObject headers to be self contained
+        FileTree chipTree = fileTree(dir: "$rootDir/src/include/FRC_FPGA_ChipObject/nRoboRIO_FPGANamespace")
+        chipTree.each { File file ->
+            String contents = file.getText('UTF-8')
+            contents = contents.replaceAll('#include \"tSystemInterface.h\"', '#include \"../tSystem.h\"\n#include \"../tSystemInterface.h\"')
+            file.write(contents, 'UTF-8')
+        }
+
+        // Patch NetComm headers to work on Windows
+        FileTree netTree = fileTree(dir: "$rootDir/src/include/FRC_NetworkCommunication")
+        netTree.each { File file ->
+            String contents = file.getText('UTF-8')
+            contents = contents.replaceAll('#ifdef WIN32', '#ifdef _WIN32')
+            contents = contents.replaceAll('# include <vxWorks_compat.h>', '#include <windows.h>')
+            contents = contents.replaceAll('#include <vxWorks_compat.h>', '#include <windows.h>')
+            file.write(contents, 'UTF-8')
+        }
+
+        FileTree allTree = fileTree(dir: "$rootDir/src/include/")
+        allTree.each { File file ->
+            String contents = file.getText('UTF-8')
+            contents = contents.replaceAll('\r\n', '\n')
+            file.write(contents, 'UTF-8')
+        }
+
+        // Move UsageReporting header to the HAL, because it is necessary for our
+        // UsageReporting in WPILibC.
+
+        copy {
+            from("$rootDir/src/include/FRC_NetworkCommunication") {
+                include 'UsageReporting.h'
+            }
+            into "$buildDir/copyToWPILib/hal/src/main/native/include/HAL"
+        }
+
+        delete {
+            delete "$rootDir/src/include/FRC_NetworkCommunication/UsageReporting.h"
+        }
+    }
+}
+
+wrapper {
+  gradleVersion = '4.8'
+}
