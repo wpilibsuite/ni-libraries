@@ -84,6 +84,19 @@ build.dependsOn libZip
 addTaskToCopyAllOutputs(headersZip)
 addTaskToCopyAllOutputs(libZip)
 
+publishing {
+    publications {
+        nilibraries(MavenPublication) {
+            artifact libZip
+            artifact headersZip
+
+            artifactId = "${baseArtifactId}"
+            groupId artifactGroupId
+            version pubVersion
+        }
+    }
+}
+
 task patchNiLibraries() {
     doLast {
         // Patch ChipObject headers to be self contained
