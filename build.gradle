@@ -1,5 +1,6 @@
 plugins {
     id 'base'
+    id 'java'
     id 'maven-publish'
 }
 
@@ -110,7 +111,8 @@ publishing {
             version pubVersion
         }
         netcomm(MavenPublication) {
-            netCommHeaders
+            artifact netCommHeaders
+            artifact jar
 
             artifactId = "${netcommBaseArtifactId}"
             groupId artifactGroupId
