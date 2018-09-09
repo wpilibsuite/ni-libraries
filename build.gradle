@@ -16,6 +16,15 @@ publishing {
     }
 }
 
+def genNetcomm = tasks.register('generateNetcomm', PythonTask) {
+    inputs.file "$rootDir/gen/wpilibj_frcnetcomm.py"
+    outputs.file "$rootDir/src/main/java/edu/wpi/first/wpilibj/hal/FRCNetComm.java"
+
+    command = "$rootDir/gen/wpilibj_frcnetcomm.py"
+}
+
+compileJava.dependsOn genNetcomm
+
 def allOutputsFolder = file("$buildDir/allOutputs")
 
 task copyAllOutputs(type: Copy) {
