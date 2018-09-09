@@ -30,9 +30,12 @@ ext.addTaskToCopyAllOutputs = { task ->
 
 def pubVersion = '2018.17.0'
 
-def baseArtifactId = 'ni-libraries'
+def baseArtifactId = 'chipobject'
 def artifactGroupId = 'edu.wpi.first.ni-libraries'
-def zipBaseName = '_GROUP_edu_wpi_first_ni-libraries_ID_ni-libraries_CLS'
+def zipBaseName = '_GROUP_edu_wpi_first_ni-libraries_ID_chipobject_CLS'
+
+def netcommBaseArtifactId = 'netcomm'
+def netcommZipBaseName = '_GROUP_edu_wpi_first_ni-libraries_ID_netcomm_CLS'
 
 def outputsFolder = file("$project.buildDir/outputs")
 
@@ -73,24 +76,43 @@ task headersZip(type: Zip) {
     baseName = zipBaseName
     classifier = "headers"
 
-    from('src/include') {
-        into '/'
+    from('src/include/FRC_FPGA_ChipObject') {
+        into '/FRC_FPGA_ChipObject'
+    }
+}
+
+task netCommHeaders(type: Zip) {
+    destinationDir = outputsFolder
+    baseName = netcommZipBaseName
+    classifier = "headers"
+
+    from('src/include/FRC_NetworkCommunication') {
+        into '/FRC_NetworkCommunication'
     }
 }
 
 build.dependsOn headersZip
+build.dependsOn netCommHeaders
 build.dependsOn libZip
 
 addTaskToCopyAllOutputs(headersZip)
 addTaskToCopyAllOutputs(libZip)
+addTaskToCopyAllOutputs(netCommHeaders)
 
 publishing {
     publications {
-        nilibraries(MavenPublication) {
+        chipobject(MavenPublication) {
             artifact libZip
             artifact headersZip
 
             artifactId = "${baseArtifactId}"
+            groupId artifactGroupId
+            version pubVersion
+        }
+        netcomm(MavenPublication) {
+            netCommHeaders
+
+            artifactId = "${netcommBaseArtifactId}"
             groupId artifactGroupId
             version pubVersion
         }
@@ -123,23 +145,9 @@ task patchNiLibraries() {
             contents = contents.replaceAll('\r\n', '\n')
             file.write(contents, 'UTF-8')
         }
-
-        // Move UsageReporting header to the HAL, because it is necessary for our
-        // UsageReporting in WPILibC.
-
-        copy {
-            from("$rootDir/src/include/FRC_NetworkCommunication") {
-                include 'UsageReporting.h'
-            }
-            into "$buildDir/copyToWPILib/hal/src/main/native/include/HAL"
-        }
-
-        delete {
-            delete "$rootDir/src/include/FRC_NetworkCommunication/UsageReporting.h"
-        }
     }
 }
 
 wrapper {
-  gradleVersion = '4.8'
+  gradleVersion = '4.9'
 }
