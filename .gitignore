@@ -5,3 +5,5 @@ bin/
 .vscode/
 .classpath
 .gradle/
+
+FRCNetComm.java
