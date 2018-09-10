@@ -20,7 +20,7 @@ def genNetcomm = tasks.register('generateNetcomm', PythonTask) {
     inputs.file "$rootDir/gen/wpilibj_frcnetcomm.py"
     outputs.file "$rootDir/src/main/java/edu/wpi/first/wpilibj/hal/FRCNetComm.java"
 
-    command = "$rootDir/gen/wpilibj_frcnetcomm.py"
+    command = "\"$rootDir/gen/wpilibj_frcnetcomm.py\""
 }
 
 compileJava.dependsOn genNetcomm
@@ -45,8 +45,11 @@ def baseArtifactId = 'chipobject'
 def artifactGroupId = 'edu.wpi.first.ni-libraries'
 def zipBaseName = '_GROUP_edu_wpi_first_ni-libraries_ID_chipobject_CLS'
 
-def netcommBaseArtifactId = 'netcomm'
-def netcommZipBaseName = '_GROUP_edu_wpi_first_ni-libraries_ID_netcomm_CLS'
+def netcommBaseArtifactId = 'netcomm-cpp'
+def netcommZipBaseName = '_GROUP_edu_wpi_first_ni-libraries_ID_netcomm-cpp_CLS'
+
+def netcommJavaBaseArtifactId = 'netcomm-java'
+def netcommJavaZipBaseName = '_GROUP_edu_wpi_first_ni-libraries_ID_netcomm-java_CLS'
 
 def outputsFolder = file("$project.buildDir/outputs")
 
@@ -112,15 +115,23 @@ task netCommHeaders(type: Zip) {
     }
 }
 
+task outputJar(type: Jar, dependsOn: classes) {
+    baseName netcommJavaZipBaseName
+    destinationDir outputsFolder
+    from sourceSets.main.output
+}
+
 build.dependsOn netCommLib
 build.dependsOn headersZip
 build.dependsOn netCommHeaders
 build.dependsOn libZip
+build.dependsOn outputJar
 
 addTaskToCopyAllOutputs(netCommLib)
 addTaskToCopyAllOutputs(headersZip)
 addTaskToCopyAllOutputs(libZip)
 addTaskToCopyAllOutputs(netCommHeaders)
+addTaskToCopyAllOutputs(outputJar)
 
 publishing {
     publications {
@@ -132,12 +143,18 @@ publishing {
             groupId artifactGroupId
             version pubVersion
         }
-        netcomm(MavenPublication) {
+        netcommCpp(MavenPublication) {
             artifact netCommLib
             artifact netCommHeaders
-            artifact jar
 
             artifactId = "${netcommBaseArtifactId}"
+            groupId artifactGroupId
+            version pubVersion
+        }
+        netcommJava(MavenPublication) {
+            artifact outputJar
+
+            artifactId = "${netcommJavaBaseArtifactId}"
             groupId artifactGroupId
             version pubVersion
         }
