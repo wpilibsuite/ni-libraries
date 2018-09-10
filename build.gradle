@@ -77,7 +77,7 @@ task libZip(type: Zip) {
     baseName = zipBaseName
     classifier = "linuxathena"
 
-    from('src/lib') {
+    from('src/lib/chipobject') {
         into '/linux/athena/shared/'
     }
 }
@@ -92,6 +92,16 @@ task headersZip(type: Zip) {
     }
 }
 
+task netCommLib(type: Zip) {
+    destinationDir = outputsFolder
+    baseName = netcommZipBaseName
+    classifier = "linuxathena"
+
+    from('src/lib/netcomm') {
+        into '/linux/athena/shared/'
+    }
+}
+
 task netCommHeaders(type: Zip) {
     destinationDir = outputsFolder
     baseName = netcommZipBaseName
@@ -102,10 +112,12 @@ task netCommHeaders(type: Zip) {
     }
 }
 
+build.dependsOn netCommLib
 build.dependsOn headersZip
 build.dependsOn netCommHeaders
 build.dependsOn libZip
 
+addTaskToCopyAllOutputs(netCommLib)
 addTaskToCopyAllOutputs(headersZip)
 addTaskToCopyAllOutputs(libZip)
 addTaskToCopyAllOutputs(netCommHeaders)
@@ -121,6 +133,7 @@ publishing {
             version pubVersion
         }
         netcomm(MavenPublication) {
+            artifact netCommLib
             artifact netCommHeaders
             artifact jar
 
