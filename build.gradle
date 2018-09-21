@@ -1,8 +1,6 @@
 plugins {
     id 'base'
-    id 'java'
     id 'maven-publish'
-    id 'ru.vyarus.use-python' version '1.2.0'
 }
 
 publishing {
@@ -16,14 +14,6 @@ publishing {
     }
 }
 
-def genNetcomm = tasks.register('generateNetcomm', PythonTask) {
-    inputs.file "$rootDir/gen/wpilibj_frcnetcomm.py"
-    outputs.file "$rootDir/src/main/java/edu/wpi/first/wpilibj/hal/FRCNetComm.java"
-
-    command = "gen/wpilibj_frcnetcomm.py"
-}
-
-compileJava.dependsOn genNetcomm
 
 def allOutputsFolder = file("$buildDir/allOutputs")
 
@@ -39,17 +29,14 @@ ext.addTaskToCopyAllOutputs = { task ->
     copyAllOutputs.from task.archivePath
 }
 
-def pubVersion = '2018.17.0'
+def pubVersion = '2018.17.1'
 
 def baseArtifactId = 'chipobject'
 def artifactGroupId = 'edu.wpi.first.ni-libraries'
 def zipBaseName = '_GROUP_edu_wpi_first_ni-libraries_ID_chipobject_CLS'
 
-def netcommBaseArtifactId = 'netcomm-cpp'
-def netcommZipBaseName = '_GROUP_edu_wpi_first_ni-libraries_ID_netcomm-cpp_CLS'
-
-def netcommJavaBaseArtifactId = 'netcomm-java'
-def netcommJavaZipBaseName = '_GROUP_edu_wpi_first_ni-libraries_ID_netcomm-java_CLS'
+def netcommBaseArtifactId = 'netcomm'
+def netcommZipBaseName = '_GROUP_edu_wpi_first_ni-libraries_ID_netcomm_CLS'
 
 def outputsFolder = file("$project.buildDir/outputs")
 
@@ -115,23 +102,15 @@ task netCommHeaders(type: Zip) {
     }
 }
 
-task outputJar(type: Jar, dependsOn: classes) {
-    baseName netcommJavaZipBaseName
-    destinationDir outputsFolder
-    from sourceSets.main.output
-}
-
 build.dependsOn netCommLib
 build.dependsOn headersZip
 build.dependsOn netCommHeaders
 build.dependsOn libZip
-build.dependsOn outputJar
 
 addTaskToCopyAllOutputs(netCommLib)
 addTaskToCopyAllOutputs(headersZip)
 addTaskToCopyAllOutputs(libZip)
 addTaskToCopyAllOutputs(netCommHeaders)
-addTaskToCopyAllOutputs(outputJar)
 
 publishing {
     publications {
@@ -143,18 +122,11 @@ publishing {
             groupId artifactGroupId
             version pubVersion
         }
-        netcommCpp(MavenPublication) {
+        netcomm(MavenPublication) {
             artifact netCommLib
             artifact netCommHeaders
 
             artifactId = "${netcommBaseArtifactId}"
-            groupId artifactGroupId
-            version pubVersion
-        }
-        netcommJava(MavenPublication) {
-            artifact outputJar
-
-            artifactId = "${netcommJavaBaseArtifactId}"
             groupId artifactGroupId
             version pubVersion
         }
