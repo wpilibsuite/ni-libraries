@@ -29,7 +29,7 @@ ext.addTaskToCopyAllOutputs = { task ->
     copyAllOutputs.from task.archivePath
 }
 
-def pubVersion = '2019.4.1'
+def pubVersion = '2019.4.2'
 
 def baseArtifactId = 'chipobject'
 def artifactGroupId = 'edu.wpi.first.ni-libraries'
@@ -72,6 +72,16 @@ task libZip(type: Zip) {
     }
 }
 
+task libZipDebug(type: Zip) {
+    destinationDir = outputsFolder
+    baseName = zipBaseName
+    classifier = "linuxathenadebug"
+
+    from('src/lib/chipobject') {
+        into '/linux/athena/shared/'
+    }
+}
+
 task headersZip(type: Zip) {
     destinationDir = outputsFolder
     baseName = zipBaseName
@@ -92,6 +102,16 @@ task netCommLib(type: Zip) {
     }
 }
 
+task netCommLibDebug(type: Zip) {
+    destinationDir = outputsFolder
+    baseName = netcommZipBaseName
+    classifier = "linuxathenadebug"
+
+    from('src/lib/netcomm') {
+        into '/linux/athena/shared/'
+    }
+}
+
 task netCommHeaders(type: Zip) {
     destinationDir = outputsFolder
     baseName = netcommZipBaseName
@@ -106,17 +126,22 @@ build.dependsOn netCommLib
 build.dependsOn headersZip
 build.dependsOn netCommHeaders
 build.dependsOn libZip
+build.dependsOn libZipDebug
+build.dependsOn netCommLibDebug
 
 addTaskToCopyAllOutputs(netCommLib)
 addTaskToCopyAllOutputs(headersZip)
 addTaskToCopyAllOutputs(libZip)
 addTaskToCopyAllOutputs(netCommHeaders)
+addTaskToCopyAllOutputs(libZipDebug)
+addTaskToCopyAllOutputs(netCommLibDebug)
 
 publishing {
     publications {
         chipobject(MavenPublication) {
             artifact libZip
             artifact headersZip
+            artifact libZipDebug
 
             artifactId = "${baseArtifactId}"
             groupId artifactGroupId
@@ -125,6 +150,7 @@ publishing {
         netcomm(MavenPublication) {
             artifact netCommLib
             artifact netCommHeaders
+            artifact netCommLibDebug
 
             artifactId = "${netcommBaseArtifactId}"
             groupId artifactGroupId
