@@ -102,7 +102,8 @@ namespace nUsageReporting
         kResourceType_CAN,
         kResourceType_DigilentDMC60, // 80
         kResourceType_PWMVictorSPX,
-        kResourceType_RevSparkMax,
+        kResourceType_RevSparkMaxPWM,
+        kResourceType_RevSparkMaxCAN,
     } tResourceType;
 
     typedef enum
