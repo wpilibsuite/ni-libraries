@@ -29,7 +29,7 @@ ext.addTaskToCopyAllOutputs = { task ->
     copyAllOutputs.from task.archivePath
 }
 
-def pubVersion = '2019.9.3'
+def pubVersion = '2019.12.1'
 
 def baseArtifactId = 'chipobject'
 def artifactGroupId = 'edu.wpi.first.ni-libraries'
@@ -70,6 +70,9 @@ task libZip(type: Zip) {
     from('src/lib/chipobject') {
         into '/linux/athena/shared/'
     }
+    from ('RequiredVersion.txt') {
+        into '/'
+    }
 }
 
 task libZipDebug(type: Zip) {
@@ -79,6 +82,9 @@ task libZipDebug(type: Zip) {
 
     from('src/lib/chipobject') {
         into '/linux/athena/shared/'
+    }
+    from ('RequiredVersion.txt') {
+        into '/'
     }
 }
 
