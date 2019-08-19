@@ -1,21 +1,51 @@
 plugins {
     id 'base'
     id 'maven-publish'
+    id "com.jfrog.artifactory" version "4.9.8"
 }
 
 publishing {
-    repositories {
-        maven {
-            url "${System.getProperty('user.home')}/releases/maven/development"
-        }
-        maven {
-            url "${System.getProperty('user.home')}/releases/maven/release"
-        }
+  repositories {
+    if (project.hasProperty('releaseRepoPublish')) {
+      maven {
+        url "${System.getProperty('user.home')}/releases/maven/release"
+      }
+    } else {
+      maven {
+        url "${System.getProperty('user.home')}/releases/maven/development"
+      }
     }
+  }
+}
+
+if (System.getenv()['RUN_AZURE_ARTIFACTORY_RELEASE'] != null) {
+  artifactory {
+    contextUrl = 'https://maven.wpilib.org:443/artifactory' // base artifactory url
+    publish {
+      repository {
+        if (project.hasProperty('releaseRepoPublish')) {
+          repoKey = 'release'
+        } else {
+          repoKey = 'development'
+        }
+        username = System.getenv()['ARTIFACTORY_PUBLISH_USERNAME']
+        password = System.getenv()['ARTIFACTORY_PUBLISH_PASSWORD']
+        maven = true
+      }
+      defaults {
+          publications ('chipobject', 'netcomm')
+      }
+    }
+  }
+  publish.dependsOn artifactoryPublish
 }
 
 
 def allOutputsFolder = file("$buildDir/allOutputs")
+
+if (project.hasProperty('releaseRepoPublish')) {
+  allOutputsFolder = file("$buildDir/allOutputsRelease")
+}
 
 task copyAllOutputs(type: Copy) {
     destinationDir allOutputsFolder
@@ -29,7 +59,7 @@ ext.addTaskToCopyAllOutputs = { task ->
     copyAllOutputs.from task.archivePath
 }
 
-def pubVersion = '2019.12.1'
+def pubVersion = '2019.12.2'
 
 def baseArtifactId = 'chipobject'
 def artifactGroupId = 'edu.wpi.first.ni-libraries'
@@ -195,5 +225,5 @@ task patchNiLibraries() {
 }
 
 wrapper {
-  gradleVersion = '4.9'
+  gradleVersion = '5.4.1'
 }
