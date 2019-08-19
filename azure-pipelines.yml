@@ -9,6 +9,9 @@ trigger:
 pool:
   vmImage: 'ubuntu-latest'
 
+variables:
+- group: Artifactory-Package-Publish
+
 steps:
 - task: Gradle@2
   inputs:
@@ -21,6 +24,9 @@ steps:
     publishJUnitResults: false
     testResultsFiles: '**/TEST-*.xml'
     tasks: 'publish'
+  env:
+    ARTIFACTORY_PUBLISH_USERNAME: $(PublishUserName)
+    ARTIFACTORY_PUBLISH_PASSWORD: $(PublishPassword)
 
 - task: Gradle@2
   inputs:
@@ -33,3 +39,6 @@ steps:
     publishJUnitResults: false
     testResultsFiles: '**/TEST-*.xml'
     tasks: 'publish -PreleaseRepoPublish'
+  env:
+    ARTIFACTORY_PUBLISH_USERNAME: $(PublishUserName)
+    ARTIFACTORY_PUBLISH_PASSWORD: $(PublishPassword)
