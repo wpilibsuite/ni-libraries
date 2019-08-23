@@ -20,7 +20,7 @@ publishing {
 
 if (System.getenv()['RUN_AZURE_ARTIFACTORY_RELEASE'] != null) {
   artifactory {
-    contextUrl = 'https://maven.wpilib.org:443/artifactory' // base artifactory url
+    contextUrl = 'https://frcmaven.wpi.edu/artifactory' // base artifactory url
     publish {
       repository {
         if (project.hasProperty('releaseRepoPublish')) {
