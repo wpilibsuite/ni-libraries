@@ -59,7 +59,7 @@ ext.addTaskToCopyAllOutputs = { task ->
     copyAllOutputs.from task.archivePath
 }
 
-def pubVersion = '2019.12.2'
+def pubVersion = '2019.12.3'
 
 def baseArtifactId = 'chipobject'
 def artifactGroupId = 'edu.wpi.first.ni-libraries'
@@ -125,6 +125,10 @@ task headersZip(type: Zip) {
 
     from('src/include/FRC_FPGA_ChipObject') {
         into '/FRC_FPGA_ChipObject'
+    }
+
+    from ('src/include/visa') {
+        into '/visa'
     }
 }
 
