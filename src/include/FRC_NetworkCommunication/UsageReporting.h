@@ -105,6 +105,12 @@ namespace nUsageReporting
         kResourceType_RevSparkMaxPWM,
         kResourceType_RevSparkMaxCAN,
         kResourceType_ADIS16470,
+        kResourceType_PIDController2,
+        kResourceType_ProfiledPIDController,
+        kResourceType_Kinematics,
+        kResourceType_Odometry,
+        kResourceType_Units,
+        kResourceType_TrapezoidProfile, // 90
     } tResourceType;
 
     typedef enum
@@ -114,6 +120,7 @@ namespace nUsageReporting
         kLanguage_Java = 3,
         kLanguage_Python = 4,
         kLanguage_DotNet = 5,
+        kLanguage_Kotlin = 6,
 
         kCANPlugin_BlackJagBridge = 1,
         kCANPlugin_2CAN = 2,
@@ -159,8 +166,17 @@ namespace nUsageReporting
         kADXL345_I2C = 2,
 
         kCommand_Scheduler = 1,
+        kCommand2_Scheduler = 2,
 
         kSmartDashboard_Instance = 1,
+
+        kKinematics_DifferentialDrive = 1,
+        kKinematics_MecanumDrive = 2,
+        kKinematics_SwerveDrive = 3,
+
+        kOdometry_DifferentialDrive = 1,
+        kOdometry_MecanumDrive = 2,
+        kOdometry_SwerveDrive = 3,
     } tInstances;
 
     /**
