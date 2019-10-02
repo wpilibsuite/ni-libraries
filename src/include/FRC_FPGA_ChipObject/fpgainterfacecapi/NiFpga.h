@@ -652,7 +652,7 @@ static NiFpga_Inline NiFpga_Status NiFpga_MergeStatus(
  * This struct contains information needed to interpret an FXP Type.
  *   - `isSigned` tells if the type is signed.
  *   - `wordLength` tells us the number of bits used in the type.
- *   - `integerWordLength` is the number of bits to shift the binary point to 
+ *   - `integerWordLength` is the number of bits to shift the binary point to
  *     reach the most significant bit.
  *
  * More information can be found at the following links:
@@ -715,7 +715,14 @@ static NiFpga_Inline float NiFpga_CalculateFxpDeltaFloat(
    {
       delta = 1 << (exponent + subNormalBias + significandStorageWidth);
    }
+#ifdef NiFpga_Linux
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstrict-aliasing"
+#endif
    return *((float*)(&delta));
+#ifdef NiFpga_Linux
+#pragma GCC diagnostic pop
+#endif
 }
 
 /*
@@ -813,7 +820,14 @@ static NiFpga_Inline double NiFpga_CalculateFxpDeltaDouble(
    {
       delta = 1ULL << (exponent + subNormalBias + significandStorageWidth);
    }
+#ifdef NiFpga_Linux
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstrict-aliasing"
+#endif
    return *((double*)(&delta));
+#ifdef NiFpga_Linux
+#pragma GCC diagnostic pop
+#endif
 }
 
 /** \addtogroup FXP
