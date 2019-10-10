@@ -205,6 +205,8 @@
 #include <stddef.h>
 /* Included for definition of FLT_MAX and DBL_MAX */
 #include <float.h>
+/* Included for definition of ldexp and ldexpf */
+#include <math.h>
 
 #if NiFpga_Cpp
 extern "C"
@@ -683,45 +685,11 @@ typedef struct NiFpga_FxpTypeInfo
 static NiFpga_Inline float NiFpga_CalculateFxpDeltaFloat(
                                           const NiFpga_FxpTypeInfo typeInfo)
 {
-   const int32_t exponent =
-      typeInfo.integerWordLength - typeInfo.wordLength;
-   /*
-      Constants taken from:
-      https://en.wikipedia.org/wiki/IEEE_754#Basic_and_interchange_formats
-   */
-   const int32_t exponentBias = 127;
-   const int32_t subNormalBias = 126;
-   const int32_t maximumExponent = 127;
-   const int32_t minimumExponent = -149;
-   const int32_t minimumNormalExponent = -126;
-   const int32_t significandStorageWidth = 23;
-   const int32_t exponentStorageWidth = 8;
-   uint32_t delta = 0;
-   if (exponent < minimumExponent)
-   {
-     return 0.0;
-   }
-   if (exponent > maximumExponent)
-   {
-      return FLT_MAX;
-   }
-   if (exponent >= minimumNormalExponent)
-   {
-      const uint32_t exponentMask = (1 << exponentStorageWidth) - 1;
-      delta = ((exponent + exponentBias) & exponentMask)
-               << significandStorageWidth;
-   }
-   else
-   {
-      delta = 1 << (exponent + subNormalBias + significandStorageWidth);
-   }
-#ifdef NiFpga_Linux
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wstrict-aliasing"
-#endif
-   return *((float*)(&delta));
-#ifdef NiFpga_Linux
-#pragma GCC diagnostic pop
+   const int32_t exponent = typeInfo.integerWordLength - typeInfo.wordLength;
+#if NiFpga_C99
+   return ldexpf(FLT_EPSILON, exponent + FLT_MANT_DIG - 1);
+#else
+   return (float)ldexp((double)FLT_EPSILON, exponent + FLT_MANT_DIG - 1);
 #endif
 }
 
@@ -788,46 +756,8 @@ static NiFpga_Inline float NiFpga_ConvertFromFxpToFloat(
 static NiFpga_Inline double NiFpga_CalculateFxpDeltaDouble(
                                           const NiFpga_FxpTypeInfo typeInfo)
 {
-   const int32_t exponent =
-      typeInfo.integerWordLength - typeInfo.wordLength;
-   /*
-      Constants taken from:
-      https://en.wikipedia.org/wiki/IEEE_754#Basic_and_interchange_formats
-   */
-   const int32_t exponentBias = 1023;
-   const int32_t subNormalBias = 1022;
-   const int32_t maximumExponent = 1023;
-   const int32_t minimumExponent = -1074;
-   const int32_t minimumNormalExponent = -1022;
-   const int32_t significandStorageWidth = 52;
-   const int32_t exponentStorageWidth = 11;
-   uint64_t delta = 0;
-   if (exponent < minimumExponent)
-   {
-      return 0.0;
-   }
-   if (exponent > maximumExponent)
-   {
-      return DBL_MAX;
-   }
-   if (exponent >= minimumNormalExponent)
-   {
-      const uint64_t exponentMask = (1 << exponentStorageWidth) - 1;
-      delta = ((exponent + exponentBias) & exponentMask)
-               << significandStorageWidth;
-   }
-   else
-   {
-      delta = 1ULL << (exponent + subNormalBias + significandStorageWidth);
-   }
-#ifdef NiFpga_Linux
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wstrict-aliasing"
-#endif
-   return *((double*)(&delta));
-#ifdef NiFpga_Linux
-#pragma GCC diagnostic pop
-#endif
+   const int32_t exponent = typeInfo.integerWordLength - typeInfo.wordLength;
+   return ldexp(DBL_EPSILON, exponent + DBL_MANT_DIG - 1);
 }
 
 /** \addtogroup FXP
@@ -989,7 +919,8 @@ typedef uint32_t NiFpga_Session;
  */
 typedef enum
 {
-   NiFpga_OpenAttribute_NoRun = 1
+   NiFpga_OpenAttribute_NoRun = 1,
+   NiFpga_OpenAttribute_BitfilePathIsUTF8 = 2
 } NiFpga_OpenAttribute;
 
 /**

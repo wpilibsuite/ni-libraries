@@ -139,16 +139,16 @@ extern "C" {
 
 	// this uint32_t is really a LVRefNum
 	int EXPORT_FUNC setNewDataOccurRef(uint32_t refnum);
-
-	int EXPORT_FUNC FRC_NetworkCommunication_getControlWord(struct ControlWord_t *controlWord);
-	int EXPORT_FUNC FRC_NetworkCommunication_getWatchdogActive(void);
-	int EXPORT_FUNC FRC_NetworkCommunication_getAllianceStation(enum AllianceStationID_t *allianceStation);
+	
+	int EXPORT_FUNC FRC_NetworkCommunication_getControlWord(struct ControlWord_t *controlWord); // Low-latency
+	int EXPORT_FUNC FRC_NetworkCommunication_getWatchdogActive(void); // Low-latency
+	int EXPORT_FUNC FRC_NetworkCommunication_getAllianceStation(enum AllianceStationID_t *allianceStation); // Low-latency
 	int EXPORT_FUNC FRC_NetworkCommunication_getMatchInfo(char *eventName, enum MatchType_t *matchType, uint16_t *matchNumber, uint8_t *replayNumber,
 		uint8_t *gameSpecificMessage, uint16_t *gameSpecificMessageSize);
-	int EXPORT_FUNC FRC_NetworkCommunication_getMatchTime(float *matchTime);
-	int EXPORT_FUNC FRC_NetworkCommunication_getJoystickAxes(uint8_t joystickNum, struct JoystickAxes_t *axes, uint8_t maxAxes);
-	int EXPORT_FUNC FRC_NetworkCommunication_getJoystickButtons(uint8_t joystickNum, uint32_t *buttons, uint8_t *count);
-	int EXPORT_FUNC FRC_NetworkCommunication_getJoystickPOVs(uint8_t joystickNum, struct JoystickPOV_t *povs, uint8_t maxPOVs);
+	int EXPORT_FUNC FRC_NetworkCommunication_getMatchTime(float *matchTime); // Low-latency
+	int EXPORT_FUNC FRC_NetworkCommunication_getJoystickAxes(uint8_t joystickNum, struct JoystickAxes_t *axes, uint8_t maxAxes); // Low-latency
+	int EXPORT_FUNC FRC_NetworkCommunication_getJoystickButtons(uint8_t joystickNum, uint32_t *buttons, uint8_t *count); // Low-latency
+	int EXPORT_FUNC FRC_NetworkCommunication_getJoystickPOVs(uint8_t joystickNum, struct JoystickPOV_t *povs, uint8_t maxPOVs); // Low-latency
 	int EXPORT_FUNC FRC_NetworkCommunication_setJoystickOutputs(uint8_t joystickNum, uint32_t hidOutputs, uint16_t leftRumble, uint16_t rightRumble);
 	int EXPORT_FUNC FRC_NetworkCommunication_getJoystickDesc(uint8_t joystickNum, uint8_t *isXBox, uint8_t *type, char *name,
 		uint8_t *axisCount, uint8_t *axisTypes, uint8_t *buttonCount, uint8_t *povCount);
