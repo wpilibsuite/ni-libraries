@@ -1,15 +1,15 @@
 // Copyright (c) National Instruments 2008.  All Rights Reserved.
 // Do Not Edit... this file is generated!
 
-#ifndef __nFRC_2019_19_0_2_DMA_h__
-#define __nFRC_2019_19_0_2_DMA_h__
+#ifndef __nFRC_2020_20_0_0_DMA_h__
+#define __nFRC_2020_20_0_0_DMA_h__
 
 #include "../tSystem.h"
 #include "../tSystemInterface.h"
 
 namespace nFPGA
 {
-namespace nFRC_2019_19_0_2
+namespace nFRC_2020_20_0_0
 {
 
 class tDMA
@@ -51,9 +51,13 @@ public:
          unsigned Enable_Encoders_High : 1;
          unsigned Enable_EncoderTimers_Low : 1;
          unsigned Enable_EncoderTimers_High : 1;
+         unsigned Enable_DutyCycle_Low : 1;
+         unsigned Enable_DutyCycle_High : 1;
          unsigned ExternalClock : 1;
 #else
          unsigned ExternalClock : 1;
+         unsigned Enable_DutyCycle_High : 1;
+         unsigned Enable_DutyCycle_Low : 1;
          unsigned Enable_EncoderTimers_High : 1;
          unsigned Enable_EncoderTimers_Low : 1;
          unsigned Enable_Encoders_High : 1;
@@ -78,7 +82,7 @@ public:
 #endif
       };
       struct{
-         unsigned value : 22;
+         unsigned value : 24;
       };
    } tConfig;
    typedef
@@ -139,6 +143,8 @@ public:
    virtual void writeConfig_Enable_Encoders_High(bool value, tRioStatusCode *status) = 0;
    virtual void writeConfig_Enable_EncoderTimers_Low(bool value, tRioStatusCode *status) = 0;
    virtual void writeConfig_Enable_EncoderTimers_High(bool value, tRioStatusCode *status) = 0;
+   virtual void writeConfig_Enable_DutyCycle_Low(bool value, tRioStatusCode *status) = 0;
+   virtual void writeConfig_Enable_DutyCycle_High(bool value, tRioStatusCode *status) = 0;
    virtual void writeConfig_ExternalClock(bool value, tRioStatusCode *status) = 0;
    virtual tConfig readConfig(tRioStatusCode *status) = 0;
    virtual bool readConfig_Pause(tRioStatusCode *status) = 0;
@@ -162,6 +168,8 @@ public:
    virtual bool readConfig_Enable_Encoders_High(tRioStatusCode *status) = 0;
    virtual bool readConfig_Enable_EncoderTimers_Low(tRioStatusCode *status) = 0;
    virtual bool readConfig_Enable_EncoderTimers_High(tRioStatusCode *status) = 0;
+   virtual bool readConfig_Enable_DutyCycle_Low(tRioStatusCode *status) = 0;
+   virtual bool readConfig_Enable_DutyCycle_High(tRioStatusCode *status) = 0;
    virtual bool readConfig_ExternalClock(tRioStatusCode *status) = 0;
 
 
@@ -195,4 +203,4 @@ private:
 }
 }
 
-#endif // __nFRC_2019_19_0_2_DMA_h__
+#endif // __nFRC_2020_20_0_0_DMA_h__

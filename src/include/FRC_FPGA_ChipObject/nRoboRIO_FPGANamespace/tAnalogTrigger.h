@@ -1,15 +1,15 @@
 // Copyright (c) National Instruments 2008.  All Rights Reserved.
 // Do Not Edit... this file is generated!
 
-#ifndef __nFRC_2019_19_0_2_AnalogTrigger_h__
-#define __nFRC_2019_19_0_2_AnalogTrigger_h__
+#ifndef __nFRC_2020_20_0_0_AnalogTrigger_h__
+#define __nFRC_2020_20_0_0_AnalogTrigger_h__
 
 #include "../tSystem.h"
 #include "../tSystemInterface.h"
 
 namespace nFPGA
 {
-namespace nFRC_2019_19_0_2
+namespace nFRC_2020_20_0_0
 {
 
 class tAnalogTrigger
@@ -53,6 +53,7 @@ public:
 #ifdef __vxworks
          unsigned Channel : 3;
          unsigned Averaged : 1;
+         unsigned DutyCycle : 1;
          unsigned Filter : 1;
          unsigned FloatingRollover : 1;
          signed RolloverLimit : 8;
@@ -60,12 +61,13 @@ public:
          signed RolloverLimit : 8;
          unsigned FloatingRollover : 1;
          unsigned Filter : 1;
+         unsigned DutyCycle : 1;
          unsigned Averaged : 1;
          unsigned Channel : 3;
 #endif
       };
       struct{
-         unsigned value : 14;
+         unsigned value : 15;
       };
    } tSourceSelect;
 
@@ -77,12 +79,14 @@ public:
    virtual void writeSourceSelect(tSourceSelect value, tRioStatusCode *status) = 0;
    virtual void writeSourceSelect_Channel(unsigned char value, tRioStatusCode *status) = 0;
    virtual void writeSourceSelect_Averaged(bool value, tRioStatusCode *status) = 0;
+   virtual void writeSourceSelect_DutyCycle(bool value, tRioStatusCode *status) = 0;
    virtual void writeSourceSelect_Filter(bool value, tRioStatusCode *status) = 0;
    virtual void writeSourceSelect_FloatingRollover(bool value, tRioStatusCode *status) = 0;
    virtual void writeSourceSelect_RolloverLimit(signed short value, tRioStatusCode *status) = 0;
    virtual tSourceSelect readSourceSelect(tRioStatusCode *status) = 0;
    virtual unsigned char readSourceSelect_Channel(tRioStatusCode *status) = 0;
    virtual bool readSourceSelect_Averaged(tRioStatusCode *status) = 0;
+   virtual bool readSourceSelect_DutyCycle(tRioStatusCode *status) = 0;
    virtual bool readSourceSelect_Filter(tRioStatusCode *status) = 0;
    virtual bool readSourceSelect_FloatingRollover(tRioStatusCode *status) = 0;
    virtual signed short readSourceSelect_RolloverLimit(tRioStatusCode *status) = 0;
@@ -127,4 +131,4 @@ private:
 }
 }
 
-#endif // __nFRC_2019_19_0_2_AnalogTrigger_h__
+#endif // __nFRC_2020_20_0_0_AnalogTrigger_h__
