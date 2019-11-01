@@ -33,7 +33,7 @@ if (System.getenv()['RUN_AZURE_ARTIFACTORY_RELEASE'] != null) {
         maven = true
       }
       defaults {
-          publications ('chipobject', 'netcomm')
+          publications ('chipobject', 'netcomm', 'runtime')
       }
     }
   }
@@ -59,7 +59,7 @@ ext.addTaskToCopyAllOutputs = { task ->
     copyAllOutputs.from task.archivePath
 }
 
-def pubVersion = '2020.5.1'
+def pubVersion = '2020.5.2'
 
 def baseArtifactId = 'chipobject'
 def artifactGroupId = 'edu.wpi.first.ni-libraries'
@@ -67,6 +67,9 @@ def zipBaseName = '_GROUP_edu_wpi_first_ni-libraries_ID_chipobject_CLS'
 
 def netcommBaseArtifactId = 'netcomm'
 def netcommZipBaseName = '_GROUP_edu_wpi_first_ni-libraries_ID_netcomm_CLS'
+
+def runtimeBaseArtifactId = 'runtime'
+def runtimeZipBaseName = '_GROUP_edu_wpi_first_ni-libraries_ID_runtime_CLS'
 
 def outputsFolder = file("$project.buildDir/outputs")
 
@@ -162,12 +165,34 @@ task netCommHeaders(type: Zip) {
     }
 }
 
+task runtimeLib(type: Zip) {
+    destinationDir = outputsFolder
+    baseName = runtimeZipBaseName
+    classifier = "linuxathena"
+
+    from('src/lib/runtime') {
+        into '/linux/athena/shared/'
+    }
+}
+
+task runtimeLibDebug(type: Zip) {
+    destinationDir = outputsFolder
+    baseName = runtimeZipBaseName
+    classifier = "linuxathenadebug"
+
+    from('src/lib/runtime') {
+        into '/linux/athena/shared/'
+    }
+}
+
 build.dependsOn netCommLib
 build.dependsOn headersZip
 build.dependsOn netCommHeaders
 build.dependsOn libZip
 build.dependsOn libZipDebug
 build.dependsOn netCommLibDebug
+build.dependsOn runtimeLib
+build.dependsOn runtimeLibDebug
 
 addTaskToCopyAllOutputs(netCommLib)
 addTaskToCopyAllOutputs(headersZip)
@@ -175,6 +200,8 @@ addTaskToCopyAllOutputs(libZip)
 addTaskToCopyAllOutputs(netCommHeaders)
 addTaskToCopyAllOutputs(libZipDebug)
 addTaskToCopyAllOutputs(netCommLibDebug)
+addTaskToCopyAllOutputs(runtimeLib)
+addTaskToCopyAllOutputs(runtimeLibDebug)
 
 publishing {
     publications {
@@ -193,6 +220,14 @@ publishing {
             artifact netCommLibDebug
 
             artifactId = "${netcommBaseArtifactId}"
+            groupId artifactGroupId
+            version pubVersion
+        }
+        runtime(MavenPublication) {
+            artifact runtimeLib
+            artifact runtimeLibDebug
+
+            artifactId = "${runtimeBaseArtifactId}"
             groupId artifactGroupId
             version pubVersion
         }
