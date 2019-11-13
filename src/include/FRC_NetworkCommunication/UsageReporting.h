@@ -84,7 +84,7 @@ namespace nUsageReporting
         kResourceType_PigeonIMU,
         kResourceType_NidecBrushless,
         kResourceType_CANifier,
-        kResourceType_CTRE_future0,
+        kResourceType_TalonFX,
         kResourceType_CTRE_future1,
         kResourceType_CTRE_future2,
         kResourceType_CTRE_future3,
@@ -111,6 +111,9 @@ namespace nUsageReporting
         kResourceType_Odometry,
         kResourceType_Units,
         kResourceType_TrapezoidProfile, // 90
+        kResourceType_DutyCycle,
+        kResourceType_AddressableLEDs,
+        kResourceType_FusionVenom,
     } tResourceType;
 
     typedef enum

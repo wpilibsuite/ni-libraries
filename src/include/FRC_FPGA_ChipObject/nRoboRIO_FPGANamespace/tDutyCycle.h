@@ -1,15 +1,15 @@
 // Copyright (c) National Instruments 2008.  All Rights Reserved.
 // Do Not Edit... this file is generated!
 
-#ifndef __nFRC_2020_20_0_0_DutyCycle_h__
-#define __nFRC_2020_20_0_0_DutyCycle_h__
+#ifndef __nFRC_2020_20_1_0_DutyCycle_h__
+#define __nFRC_2020_20_1_0_DutyCycle_h__
 
 #include "../tSystem.h"
 #include "../tSystemInterface.h"
 
 namespace nFPGA
 {
-namespace nFRC_2020_20_0_0
+namespace nFRC_2020_20_1_0
 {
 
 class tDutyCycle
@@ -51,7 +51,7 @@ public:
    {
    } tOutput_IfaceConstants;
 
-   virtual unsigned int readOutput(tRioStatusCode *status) = 0;
+   virtual unsigned int readOutput(unsigned char *overflowStatus, tRioStatusCode *status) = 0;
 
 
    typedef enum
@@ -72,7 +72,7 @@ public:
    {
    } tFrequency_IfaceConstants;
 
-   virtual unsigned short readFrequency(tRioStatusCode *status) = 0;
+   virtual unsigned short readFrequency(unsigned char *overflowStatus, tRioStatusCode *status) = 0;
 
 
 
@@ -86,4 +86,4 @@ private:
 }
 }
 
-#endif // __nFRC_2020_20_0_0_DutyCycle_h__
+#endif // __nFRC_2020_20_1_0_DutyCycle_h__
