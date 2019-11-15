@@ -1,12 +1,12 @@
 // Copyright (c) National Instruments 2008.  All Rights Reserved.
 // Do Not Edit... this file is generated!
 
-#ifndef __nFRC_2020_20_1_0_nInterfaceGlobals_h__
-#define __nFRC_2020_20_1_0_nInterfaceGlobals_h__
+#ifndef __nFRC_2020_20_1_1_nInterfaceGlobals_h__
+#define __nFRC_2020_20_1_1_nInterfaceGlobals_h__
 
 namespace nFPGA
 {
-namespace nFRC_2020_20_1_0
+namespace nFRC_2020_20_1_1
 {
    extern unsigned int g_currentTargetClass;
 
@@ -15,4 +15,4 @@ namespace nFRC_2020_20_1_0
 }
 }
 
-#endif // __nFRC_2020_20_1_0_nInterfaceGlobals_h__
+#endif // __nFRC_2020_20_1_1_nInterfaceGlobals_h__

@@ -1,15 +1,15 @@
 // Copyright (c) National Instruments 2008.  All Rights Reserved.
 // Do Not Edit... this file is generated!
 
-#ifndef __nFRC_2020_20_1_0_LED_h__
-#define __nFRC_2020_20_1_0_LED_h__
+#ifndef __nFRC_2020_20_1_1_LED_h__
+#define __nFRC_2020_20_1_1_LED_h__
 
 #include "../tSystem.h"
 #include "../tSystemInterface.h"
 
 namespace nFPGA
 {
-namespace nFRC_2020_20_1_0
+namespace nFRC_2020_20_1_1
 {
 
 class tLED
@@ -27,13 +27,6 @@ public:
    } tIfaceConstants;
 
 
-
-
-   typedef enum
-   {
-   } tResetLoad_IfaceConstants;
-
-   virtual void strobeResetLoad(tRioStatusCode *status) = 0;
 
 
    typedef enum
@@ -85,6 +78,20 @@ public:
 
    typedef enum
    {
+   } tActive_IfaceConstants;
+
+   virtual bool readActive(tRioStatusCode *status) = 0;
+
+
+   typedef enum
+   {
+   } tReset_IfaceConstants;
+
+   virtual void strobeReset(tRioStatusCode *status) = 0;
+
+
+   typedef enum
+   {
    } tLoad_IfaceConstants;
 
    virtual void strobeLoad(tRioStatusCode *status) = 0;
@@ -94,8 +101,8 @@ public:
    {
    } tSyncTiming_IfaceConstants;
 
-   virtual void writeSyncTiming(unsigned int value, tRioStatusCode *status) = 0;
-   virtual unsigned int readSyncTiming(tRioStatusCode *status) = 0;
+   virtual void writeSyncTiming(unsigned short value, tRioStatusCode *status) = 0;
+   virtual unsigned short readSyncTiming(tRioStatusCode *status) = 0;
 
 
    typedef enum
@@ -123,4 +130,4 @@ private:
 }
 }
 
-#endif // __nFRC_2020_20_1_0_LED_h__
+#endif // __nFRC_2020_20_1_1_LED_h__
