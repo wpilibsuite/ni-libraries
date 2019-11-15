@@ -1,7 +1,7 @@
 #ifndef __NiFpga_HMB_h__
 #define __NiFpga_HMB_h__
 
-#include "fpgainterfacecapi/NiFpga.h"
+#include "NiFpga.h"
 
 #if NiFpga_Cpp
 extern "C"
