@@ -33,7 +33,7 @@ if (System.getenv()['RUN_AZURE_ARTIFACTORY_RELEASE'] != null) {
         maven = true
       }
       defaults {
-          publications ('chipobject', 'netcomm', 'runtime')
+          publications ('chipobject', 'netcomm', 'runtime', 'visa')
       }
     }
   }
@@ -59,7 +59,7 @@ ext.addTaskToCopyAllOutputs = { task ->
     copyAllOutputs.from task.archivePath
 }
 
-def pubVersion = '2020.7.1'
+def pubVersion = '2020.7.2'
 
 def baseArtifactId = 'chipobject'
 def artifactGroupId = 'edu.wpi.first.ni-libraries'
@@ -70,6 +70,9 @@ def netcommZipBaseName = '_GROUP_edu_wpi_first_ni-libraries_ID_netcomm_CLS'
 
 def runtimeBaseArtifactId = 'runtime'
 def runtimeZipBaseName = '_GROUP_edu_wpi_first_ni-libraries_ID_runtime_CLS'
+
+def visaBaseArtifactId = 'visa'
+def visaZipBaseName = '_GROUP_edu_wpi_first_ni-libraries_ID_visa_CLS'
 
 def outputsFolder = file("$project.buildDir/outputs")
 
@@ -129,6 +132,32 @@ task headersZip(type: Zip) {
     from('src/include/FRC_FPGA_ChipObject') {
         into '/FRC_FPGA_ChipObject'
     }
+}
+
+task visaLib(type: Zip) {
+    destinationDir = outputsFolder
+    baseName = visaZipBaseName
+    classifier = "linuxathena"
+
+    from('src/lib/visa') {
+        into '/linux/athena/shared/'
+    }
+}
+
+task visaLibDebug(type: Zip) {
+    destinationDir = outputsFolder
+    baseName = visaZipBaseName
+    classifier = "linuxathenadebug"
+
+    from('src/lib/visa') {
+        into '/linux/athena/shared/'
+    }
+}
+
+task visaHeaders(type: Zip) {
+    destinationDir = outputsFolder
+    baseName = visaZipBaseName
+    classifier = "headers"
 
     from ('src/include/visa') {
         into '/visa'
@@ -193,6 +222,9 @@ build.dependsOn libZipDebug
 build.dependsOn netCommLibDebug
 build.dependsOn runtimeLib
 build.dependsOn runtimeLibDebug
+build.dependsOn visaLib
+build.dependsOn visaLibDebug
+build.dependsOn visaHeaders
 
 addTaskToCopyAllOutputs(netCommLib)
 addTaskToCopyAllOutputs(headersZip)
@@ -202,6 +234,10 @@ addTaskToCopyAllOutputs(libZipDebug)
 addTaskToCopyAllOutputs(netCommLibDebug)
 addTaskToCopyAllOutputs(runtimeLib)
 addTaskToCopyAllOutputs(runtimeLibDebug)
+
+addTaskToCopyAllOutputs(visaLib)
+addTaskToCopyAllOutputs(visaLibDebug)
+addTaskToCopyAllOutputs(visaHeaders)
 
 publishing {
     publications {
@@ -220,6 +256,15 @@ publishing {
             artifact netCommLibDebug
 
             artifactId = "${netcommBaseArtifactId}"
+            groupId artifactGroupId
+            version pubVersion
+        }
+        visa(MavenPublication) {
+            artifact visaLib
+            artifact visaHeaders
+            artifact visaLibDebug
+
+            artifactId = "${visaBaseArtifactId}"
             groupId artifactGroupId
             version pubVersion
         }
