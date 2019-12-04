@@ -1,15 +1,15 @@
 // Copyright (c) National Instruments 2008.  All Rights Reserved.
 // Do Not Edit... this file is generated!
 
-#ifndef __nFRC_2020_20_1_1_SPI_h__
-#define __nFRC_2020_20_1_1_SPI_h__
+#ifndef __nFRC_2020_20_1_2_SPI_h__
+#define __nFRC_2020_20_1_2_SPI_h__
 
 #include "../tSystem.h"
 #include "../tSystemInterface.h"
 
 namespace nFPGA
 {
-namespace nFRC_2020_20_1_1
+namespace nFRC_2020_20_1_2
 {
 
 class tSPI
@@ -26,6 +26,23 @@ public:
       kNumSystems = 1,
    } tIfaceConstants;
 
+   typedef
+   union{
+      struct{
+#ifdef __vxworks
+         unsigned Pow2BytesPerRead : 8;
+         unsigned StallTicks : 16;
+         unsigned CsToSclkTicks : 8;
+#else
+         unsigned CsToSclkTicks : 8;
+         unsigned StallTicks : 16;
+         unsigned Pow2BytesPerRead : 8;
+#endif
+      };
+      struct{
+         unsigned value : 32;
+      };
+   } tStallConfig;
    typedef
    union{
       struct{
@@ -53,15 +70,15 @@ public:
    union{
       struct{
 #ifdef __vxworks
-         unsigned TxByteCount : 4;
+         unsigned TxByteCount : 5;
          unsigned ZeroByteCount : 7;
 #else
          unsigned ZeroByteCount : 7;
-         unsigned TxByteCount : 4;
+         unsigned TxByteCount : 5;
 #endif
       };
       struct{
-         unsigned value : 11;
+         unsigned value : 12;
       };
    } tAutoByteCount;
    typedef
@@ -94,6 +111,20 @@ public:
    } tDebugState_IfaceConstants;
 
    virtual unsigned short readDebugState(tRioStatusCode *status) = 0;
+
+
+   typedef enum
+   {
+   } tStallConfig_IfaceConstants;
+
+   virtual void writeStallConfig(tStallConfig value, tRioStatusCode *status) = 0;
+   virtual void writeStallConfig_Pow2BytesPerRead(unsigned char value, tRioStatusCode *status) = 0;
+   virtual void writeStallConfig_StallTicks(unsigned short value, tRioStatusCode *status) = 0;
+   virtual void writeStallConfig_CsToSclkTicks(unsigned char value, tRioStatusCode *status) = 0;
+   virtual tStallConfig readStallConfig(tRioStatusCode *status) = 0;
+   virtual unsigned char readStallConfig_Pow2BytesPerRead(tRioStatusCode *status) = 0;
+   virtual unsigned short readStallConfig_StallTicks(tRioStatusCode *status) = 0;
+   virtual unsigned char readStallConfig_CsToSclkTicks(tRioStatusCode *status) = 0;
 
 
    typedef enum
@@ -218,7 +249,7 @@ public:
 
    typedef enum
    {
-      kNumAutoTxRegisters = 4,
+      kNumAutoTxRegisters = 6,
       kNumAutoTxElements = 4,
    } tAutoTx_IfaceConstants;
 
@@ -234,4 +265,4 @@ private:
 }
 }
 
-#endif // __nFRC_2020_20_1_1_SPI_h__
+#endif // __nFRC_2020_20_1_2_SPI_h__

@@ -2,7 +2,7 @@
 //
 //  Defines the API for building a CAN Interface Plugin to support
 //    PWM-cable-free CAN motor control on FRC robots.  This allows you
-//    to connect any CAN interface to the secure Jaguar CAN driver.
+//    to connect any CAN interface to the CAN driver.
 //
 
 #ifndef __CANSessionMux_h__
@@ -40,6 +40,8 @@ namespace nCANSessionMux
 {
 	void sendMessage_wrapper(uint32_t messageID, const uint8_t *data, uint8_t dataSize, int32_t periodMs, int32_t *status);
 	void receiveMessage_wrapper(uint32_t *messageID, uint32_t messageIDMask, uint8_t *data, uint8_t *dataSize, uint32_t *timeStamp, int32_t *status);
+	// Stop sending all recurring periodic sends. This is always automatically called by observeUserProgramStarting
+	void resetPeriodicSends(void);
 	void openStreamSession(uint32_t *sessionHandle, uint32_t messageID, uint32_t messageIDMask, uint32_t maxMessages, int32_t *status);
 	void closeStreamSession(uint32_t sessionHandle);
 	void readStreamSession(uint32_t sessionHandle, struct tCANStreamMessage *messages, uint32_t messagesToRead, uint32_t *messagesRead, int32_t *status);
@@ -54,6 +56,7 @@ extern "C"
 
 	void FRC_NetworkCommunication_CANSessionMux_sendMessage(uint32_t messageID, const uint8_t *data, uint8_t dataSize, int32_t periodMs, int32_t *status);
 	void FRC_NetworkCommunication_CANSessionMux_receiveMessage(uint32_t *messageID, uint32_t messageIDMask, uint8_t *data, uint8_t *dataSize, uint32_t *timeStamp, int32_t *status);
+	void FRC_NetworkCommunication_CANSessionMux_resetPeriodicSends(void);
 	void FRC_NetworkCommunication_CANSessionMux_openStreamSession(uint32_t *sessionHandle, uint32_t messageID, uint32_t messageIDMask, uint32_t maxMessages, int32_t *status);
 	void FRC_NetworkCommunication_CANSessionMux_closeStreamSession(uint32_t sessionHandle);
 	void FRC_NetworkCommunication_CANSessionMux_readStreamSession(uint32_t sessionHandle, struct tCANStreamMessage *messages, uint32_t messagesToRead, uint32_t *messagesRead, int32_t *status);

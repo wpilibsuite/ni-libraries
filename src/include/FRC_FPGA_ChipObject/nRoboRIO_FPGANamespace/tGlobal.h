@@ -1,15 +1,15 @@
 // Copyright (c) National Instruments 2008.  All Rights Reserved.
 // Do Not Edit... this file is generated!
 
-#ifndef __nFRC_2020_20_1_1_Global_h__
-#define __nFRC_2020_20_1_1_Global_h__
+#ifndef __nFRC_2020_20_1_2_Global_h__
+#define __nFRC_2020_20_1_2_Global_h__
 
 #include "../tSystem.h"
 #include "../tSystemInterface.h"
 
 namespace nFPGA
 {
-namespace nFRC_2020_20_1_1
+namespace nFRC_2020_20_1_2
 {
 
 class tGlobal
@@ -44,6 +44,13 @@ public:
       };
    } tLEDs;
 
+
+
+   typedef enum
+   {
+   } tInterruptForceOnce_IfaceConstants;
+
+   virtual void strobeInterruptForceOnce(tRioStatusCode *status) = 0;
 
 
    typedef enum
@@ -90,6 +97,14 @@ public:
 
    typedef enum
    {
+   } tInterruptForceNumber_IfaceConstants;
+
+   virtual void writeInterruptForceNumber(unsigned char value, tRioStatusCode *status) = 0;
+   virtual unsigned char readInterruptForceNumber(tRioStatusCode *status) = 0;
+
+
+   typedef enum
+   {
    } tRevision_IfaceConstants;
 
    virtual unsigned int readRevision(tRioStatusCode *status) = 0;
@@ -105,4 +120,4 @@ private:
 }
 }
 
-#endif // __nFRC_2020_20_1_1_Global_h__
+#endif // __nFRC_2020_20_1_2_Global_h__

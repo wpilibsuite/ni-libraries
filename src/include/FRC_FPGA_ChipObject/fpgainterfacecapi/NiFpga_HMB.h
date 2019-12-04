@@ -1,11 +1,8 @@
-#ifndef __NiFpga_HMB_h__
-#define __NiFpga_HMB_h__
+#pragma once
+#include "fpgainterfacecapi/NiFpga.h"
 
-#include "NiFpga.h"
-
-#if NiFpga_Cpp
-extern "C"
-{
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 /**
@@ -22,8 +19,6 @@ NiFpga_Status NiFpga_OpenHostMemoryBuffer(NiFpga_Session session,
                                           void** virtualAddress,
                                           size_t* size);
 
-#if NiFpga_Cpp
+#ifdef __cplusplus
 }
-#endif
-
 #endif
