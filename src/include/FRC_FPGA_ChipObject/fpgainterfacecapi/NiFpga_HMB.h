@@ -1,5 +1,5 @@
 #pragma once
-#include "fpgainterfacecapi/NiFpga.h"
+#include "FRC_FPGA_ChipObject/fpgainterfacecapi/NiFpga.h"
 
 #ifdef __cplusplus
 extern "C" {
