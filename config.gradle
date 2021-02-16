@@ -1,0 +1,53 @@
+ext.createComponentZipTasks = { components, names, base, type, project, func ->
+    def stringNames = names.collect {it.toString()}
+    def configMap = [:]
+    components.each {
+        if (it in NativeLibrarySpec && stringNames.contains(it.name)) {
+            it.binaries.each {
+                if (!it.buildable) return
+                    def target = nativeUtils.getPublishClassifier(it)
+                if (configMap.containsKey(target)) {
+                    configMap.get(target).add(it)
+                } else {
+                    configMap.put(target, [])
+                    configMap.get(target).add(it)
+                }
+            }
+        }
+    }
+    def taskList = []
+    def outputsFolder = file("$project.buildDir/outputs")
+    configMap.each { key, value ->
+        def task = project.tasks.create(base + "-${key}", type) {
+            description = 'Creates component archive for platform ' + key
+            destinationDirectory = outputsFolder
+            classifier = key
+            archiveBaseName = base
+            duplicatesStrategy = 'exclude'
+
+            func(it, value)
+        }
+        taskList.add(task)
+
+        project.build.dependsOn task
+
+        project.artifacts {
+            task
+        }
+        addTaskToCopyAllOutputs(task)
+    }
+    return taskList
+}
+
+ext.includeStandardZipFormat = { task, value ->
+    value.each { binary ->
+        if (binary.buildable) {
+            if (binary instanceof SharedLibraryBinarySpec) {
+                task.dependsOn binary.tasks.link
+                task.from(binary.sharedLibraryFile) {
+                    into nativeUtils.getPlatformPath(binary) + '/shared'
+                }
+            }
+        }
+    }
+}
