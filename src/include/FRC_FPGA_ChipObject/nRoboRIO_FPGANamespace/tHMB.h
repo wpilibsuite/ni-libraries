@@ -1,15 +1,15 @@
 // Copyright (c) National Instruments 2008.  All Rights Reserved.
 // Do Not Edit... this file is generated!
 
-#ifndef __nFRC_2020_20_1_2_HMB_h__
-#define __nFRC_2020_20_1_2_HMB_h__
+#ifndef __nFRC_2022_22_0_0_HMB_h__
+#define __nFRC_2022_22_0_0_HMB_h__
 
 #include "../tSystem.h"
 #include "../tSystemInterface.h"
 
 namespace nFPGA
 {
-namespace nFRC_2020_20_1_2
+namespace nFRC_2022_22_0_0
 {
 
 class tHMB
@@ -56,7 +56,9 @@ public:
          unsigned Enables_PWM : 1;
          unsigned Enables_PWM_MXP : 1;
          unsigned Enables_Relay_DO_AO : 1;
+         unsigned Enables_Timestamp : 1;
 #else
+         unsigned Enables_Timestamp : 1;
          unsigned Enables_Relay_DO_AO : 1;
          unsigned Enables_PWM_MXP : 1;
          unsigned Enables_PWM : 1;
@@ -86,10 +88,38 @@ public:
 #endif
       };
       struct{
-         unsigned value : 26;
+         unsigned value : 27;
       };
    } tConfig;
 
+
+
+   typedef enum
+   {
+   } tLoopCount_IfaceConstants;
+
+   virtual signed int readLoopCount(tRioStatusCode *status) = 0;
+
+
+   typedef enum
+   {
+   } tWriteData_IfaceConstants;
+
+   virtual unsigned int readWriteData(tRioStatusCode *status) = 0;
+
+
+   typedef enum
+   {
+   } tReadData_IfaceConstants;
+
+   virtual unsigned int readReadData(tRioStatusCode *status) = 0;
+
+
+   typedef enum
+   {
+   } tWriteAddress_IfaceConstants;
+
+   virtual unsigned short readWriteAddress(tRioStatusCode *status) = 0;
 
 
    typedef enum
@@ -131,6 +161,7 @@ public:
    virtual void writeConfig_Enables_PWM(bool value, tRioStatusCode *status) = 0;
    virtual void writeConfig_Enables_PWM_MXP(bool value, tRioStatusCode *status) = 0;
    virtual void writeConfig_Enables_Relay_DO_AO(bool value, tRioStatusCode *status) = 0;
+   virtual void writeConfig_Enables_Timestamp(bool value, tRioStatusCode *status) = 0;
    virtual tConfig readConfig(tRioStatusCode *status) = 0;
    virtual bool readConfig_Enables_AI0_Low(tRioStatusCode *status) = 0;
    virtual bool readConfig_Enables_AI0_High(tRioStatusCode *status) = 0;
@@ -158,6 +189,28 @@ public:
    virtual bool readConfig_Enables_PWM(tRioStatusCode *status) = 0;
    virtual bool readConfig_Enables_PWM_MXP(tRioStatusCode *status) = 0;
    virtual bool readConfig_Enables_Relay_DO_AO(tRioStatusCode *status) = 0;
+   virtual bool readConfig_Enables_Timestamp(tRioStatusCode *status) = 0;
+
+
+   typedef enum
+   {
+   } tWriteCount_IfaceConstants;
+
+   virtual unsigned int readWriteCount(tRioStatusCode *status) = 0;
+
+
+   typedef enum
+   {
+   } tReqReadyForInput_IfaceConstants;
+
+   virtual bool readReqReadyForInput(tRioStatusCode *status) = 0;
+
+
+   typedef enum
+   {
+   } tWriteReadyForInput_IfaceConstants;
+
+   virtual bool readWriteReadyForInput(tRioStatusCode *status) = 0;
 
 
 
@@ -170,4 +223,4 @@ private:
 }
 }
 
-#endif // __nFRC_2020_20_1_2_HMB_h__
+#endif // __nFRC_2022_22_0_0_HMB_h__

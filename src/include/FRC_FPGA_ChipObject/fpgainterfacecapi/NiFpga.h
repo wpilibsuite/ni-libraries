@@ -2280,6 +2280,18 @@ NiFpga_Status NiFpga_StopFifo(NiFpga_Session session,
                               uint32_t       fifo);
 
 /**
+ * Unreserves a FIFO. This method is optional. FIFOs are only usable in the
+ * process that first uses them.  This function releases a FIFO from the using
+ * session and process so a session in a different process can use the FIFO.
+ *
+ * @param session handle to a currently open session
+ * @param fifo FIFO to unreserve
+ * @return result of the call
+ */
+NiFpga_Status NiFpga_UnreserveFifo(NiFpga_Session session,
+                                   uint32_t       fifo);
+
+/**
  * @}
  */
 
