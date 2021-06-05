@@ -1,7 +1,12 @@
+import org.gradle.nativeplatform.NativeDependencySet
+
 plugins {
     id 'base'
     id 'maven-publish'
     id "com.jfrog.artifactory" version "4.9.8"
+    id 'edu.wpi.first.NativeUtils' version '2021.1.1'
+    id 'cpp'
+    id 'c'
 }
 
 publishing {
@@ -40,6 +45,111 @@ if (System.getenv()['RUN_AZURE_ARTIFACTORY_RELEASE'] != null) {
   publish.dependsOn artifactoryPublish
 }
 
+nativeUtils.addWpiNativeUtils()
+nativeUtils.withRoboRIO()
+
+nativeUtils.wpi.addWarnings()
+nativeUtils.wpi.addWarningsAsErrors()
+
+nativeUtils.setSinglePrintPerPlatform()
+
+class FileDependencySet implements NativeDependencySet {
+    private FileCollection linkFiles;
+    private FileCollection emptySet
+
+    FileDependencySet(FileCollection files, FileCollection emptySet) {
+        linkFiles = files
+        this.emptySet = emptySet
+    }
+
+    @Override
+    FileCollection getIncludeRoots() {
+        return emptySet
+    }
+
+    @Override
+    FileCollection getLinkFiles() {
+        return linkFiles
+    }
+
+    @Override
+    FileCollection getRuntimeFiles() {
+        return emptySet
+    }
+}
+
+def netCommDependencySet = new FileDependencySet(project.files(
+    'src/lib/netcomm/libFRC_NetworkCommunication.so.20.0.0',
+    'src/lib/chipobject/libRoboRIO_FRC_ChipObject.so.20.0.0',
+    'src/lib/visa/libvisa.so'),
+    project.files())
+
+model {
+    components {
+        test(NativeExecutableSpec) {
+            targetPlatform nativeUtils.wpi.platforms.roborio
+            sources {
+                cpp {
+                    source {
+                        srcDirs 'src/test'
+                        include '**/*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/include'
+                    }
+                }
+            }
+            binaries.all {
+                linker.args '-ldl'
+                lib netCommDependencySet
+                lib library: 'embcanshim', linkage: 'shared'
+                lib library: 'fpgalvshim', linkage: 'shared'
+            }
+        }
+        embcanshim(NativeLibrarySpec) {
+            targetPlatform nativeUtils.wpi.platforms.roborio
+            sources {
+                c {
+                    source {
+                        srcDirs 'src/shims/embcan'
+                        include '**/*.c'
+                    }
+                }
+            }
+            binaries.all {
+                tasks.withType(LinkSharedLibrary) {
+                    installName = 'libnirio_emb_can.so.16'
+                }
+            }
+        }
+        fpgalvshim(NativeLibrarySpec) {
+            targetPlatform nativeUtils.wpi.platforms.roborio
+            sources {
+                c {
+                    source {
+                        srcDirs 'src/shims/fpgalv'
+                        include '**/*.c'
+                    }
+                }
+            }
+            binaries.all {
+                tasks.withType(LinkSharedLibrary) {
+                    installName = 'libNiFpgaLv.so.13'
+                }
+            }
+        }
+    }
+    binaries {
+        withType(NativeBinarySpec).all {
+            nativeUtils.usePlatformArguments(it)
+        }
+        withType(StaticLibraryBinarySpec).all {
+            buildable = false
+        }
+    }
+}
+
+apply from: 'config.gradle'
 
 def allOutputsFolder = file("$buildDir/allOutputs")
 
@@ -48,7 +158,7 @@ if (project.hasProperty('releaseRepoPublish')) {
 }
 
 task copyAllOutputs(type: Copy) {
-    destinationDir allOutputsFolder
+    destinationDir = allOutputsFolder
 }
 
 build.dependsOn copyAllOutputs
@@ -99,8 +209,8 @@ copyAllOutputs.inputs.file versionFile
 copyAllOutputs.from versionFile
 
 task libZip(type: Zip) {
-    destinationDir = outputsFolder
-    baseName = zipBaseName
+    destinationDirectory = outputsFolder
+    archiveBaseName = zipBaseName
     classifier = "linuxathena"
 
     from('src/lib/chipobject') {
@@ -112,8 +222,8 @@ task libZip(type: Zip) {
 }
 
 task libZipDebug(type: Zip) {
-    destinationDir = outputsFolder
-    baseName = zipBaseName
+    destinationDirectory = outputsFolder
+    archiveBaseName = zipBaseName
     classifier = "linuxathenadebug"
 
     from('src/lib/chipobject') {
@@ -125,8 +235,8 @@ task libZipDebug(type: Zip) {
 }
 
 task headersZip(type: Zip) {
-    destinationDir = outputsFolder
-    baseName = zipBaseName
+    destinationDirectory = outputsFolder
+    archiveBaseName = zipBaseName
     classifier = "headers"
 
     from('src/include/FRC_FPGA_ChipObject') {
@@ -135,8 +245,8 @@ task headersZip(type: Zip) {
 }
 
 task visaLib(type: Zip) {
-    destinationDir = outputsFolder
-    baseName = visaZipBaseName
+    destinationDirectory = outputsFolder
+    archiveBaseName = visaZipBaseName
     classifier = "linuxathena"
 
     from('src/lib/visa') {
@@ -145,8 +255,8 @@ task visaLib(type: Zip) {
 }
 
 task visaLibDebug(type: Zip) {
-    destinationDir = outputsFolder
-    baseName = visaZipBaseName
+    destinationDirectory = outputsFolder
+    archiveBaseName = visaZipBaseName
     classifier = "linuxathenadebug"
 
     from('src/lib/visa') {
@@ -155,8 +265,8 @@ task visaLibDebug(type: Zip) {
 }
 
 task visaHeaders(type: Zip) {
-    destinationDir = outputsFolder
-    baseName = visaZipBaseName
+    destinationDirectory = outputsFolder
+    archiveBaseName = visaZipBaseName
     classifier = "headers"
 
     from ('src/include/visa') {
@@ -165,8 +275,8 @@ task visaHeaders(type: Zip) {
 }
 
 task netCommLib(type: Zip) {
-    destinationDir = outputsFolder
-    baseName = netcommZipBaseName
+    destinationDirectory = outputsFolder
+    archiveBaseName = netcommZipBaseName
     classifier = "linuxathena"
 
     from('src/lib/netcomm') {
@@ -175,8 +285,8 @@ task netCommLib(type: Zip) {
 }
 
 task netCommLibDebug(type: Zip) {
-    destinationDir = outputsFolder
-    baseName = netcommZipBaseName
+    destinationDirectory = outputsFolder
+    archiveBaseName = netcommZipBaseName
     classifier = "linuxathenadebug"
 
     from('src/lib/netcomm') {
@@ -185,32 +295,12 @@ task netCommLibDebug(type: Zip) {
 }
 
 task netCommHeaders(type: Zip) {
-    destinationDir = outputsFolder
-    baseName = netcommZipBaseName
+    destinationDirectory = outputsFolder
+    archiveBaseName = netcommZipBaseName
     classifier = "headers"
 
     from('src/include/FRC_NetworkCommunication') {
         into '/FRC_NetworkCommunication'
-    }
-}
-
-task runtimeLib(type: Zip) {
-    destinationDir = outputsFolder
-    baseName = runtimeZipBaseName
-    classifier = "linuxathena"
-
-    from('src/lib/runtime') {
-        into '/linux/athena/shared/'
-    }
-}
-
-task runtimeLibDebug(type: Zip) {
-    destinationDir = outputsFolder
-    baseName = runtimeZipBaseName
-    classifier = "linuxathenadebug"
-
-    from('src/lib/runtime') {
-        into '/linux/athena/shared/'
     }
 }
 
@@ -220,8 +310,6 @@ build.dependsOn netCommHeaders
 build.dependsOn libZip
 build.dependsOn libZipDebug
 build.dependsOn netCommLibDebug
-build.dependsOn runtimeLib
-build.dependsOn runtimeLibDebug
 build.dependsOn visaLib
 build.dependsOn visaLibDebug
 build.dependsOn visaHeaders
@@ -232,12 +320,28 @@ addTaskToCopyAllOutputs(libZip)
 addTaskToCopyAllOutputs(netCommHeaders)
 addTaskToCopyAllOutputs(libZipDebug)
 addTaskToCopyAllOutputs(netCommLibDebug)
-addTaskToCopyAllOutputs(runtimeLib)
-addTaskToCopyAllOutputs(runtimeLibDebug)
 
 addTaskToCopyAllOutputs(visaLib)
 addTaskToCopyAllOutputs(visaLibDebug)
 addTaskToCopyAllOutputs(visaHeaders)
+
+model {
+    publishing {
+        def taskList = createComponentZipTasks($.components, ['embcanshim', 'fpgalvshim'], runtimeZipBaseName, Zip, project, includeStandardZipFormat)
+
+        publications {
+            runtime(MavenPublication) {
+                taskList.each {
+                    artifact it
+                }
+
+                artifactId = "${runtimeBaseArtifactId}"
+                groupId artifactGroupId
+                version pubVersion
+            }
+        }
+    }
+}
 
 publishing {
     publications {
@@ -265,14 +369,6 @@ publishing {
             artifact visaLibDebug
 
             artifactId = "${visaBaseArtifactId}"
-            groupId artifactGroupId
-            version pubVersion
-        }
-        runtime(MavenPublication) {
-            artifact runtimeLib
-            artifact runtimeLibDebug
-
-            artifactId = "${runtimeBaseArtifactId}"
             groupId artifactGroupId
             version pubVersion
         }
@@ -313,5 +409,5 @@ task patchNiLibraries() {
 }
 
 wrapper {
-  gradleVersion = '5.4.1'
+  gradleVersion = '6.0.1'
 }
