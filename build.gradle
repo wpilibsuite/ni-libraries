@@ -53,6 +53,8 @@ nativeUtils.wpi.addWarningsAsErrors()
 
 nativeUtils.setSinglePrintPerPlatform()
 
+nativeUtils.platformConfigs.linuxathena.linker.args.add("-Wl,--fatal-warnings")
+
 class FileDependencySet implements NativeDependencySet {
     private FileCollection linkFiles;
     private FileCollection emptySet
@@ -79,9 +81,9 @@ class FileDependencySet implements NativeDependencySet {
 }
 
 def netCommDependencySet = new FileDependencySet(project.files(
-    'src/lib/netcomm/libFRC_NetworkCommunication.so.20.0.0',
-    'src/lib/chipobject/libRoboRIO_FRC_ChipObject.so.20.0.0',
-    'src/lib/visa/libvisa.so'),
+    'src/lib/netcomm/libFRC_NetworkCommunication.so.22.0.0',
+    'src/lib/chipobject/libRoboRIO_FRC_ChipObject.so.22.0.0',
+    'src/lib/visa/libvisa.so.21.0.0'),
     project.files())
 
 model {
@@ -118,7 +120,7 @@ model {
             }
             binaries.all {
                 tasks.withType(LinkSharedLibrary) {
-                    installName = 'libnirio_emb_can.so.16'
+                    installName = 'libnirio_emb_can.so.21'
                 }
             }
         }
@@ -169,7 +171,7 @@ ext.addTaskToCopyAllOutputs = { task ->
     copyAllOutputs.from task.archivePath
 }
 
-def pubVersion = '2020.10.1'
+def pubVersion = '2022.0.0'
 
 def baseArtifactId = 'chipobject'
 def artifactGroupId = 'edu.wpi.first.ni-libraries'

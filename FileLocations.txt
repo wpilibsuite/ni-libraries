@@ -5,5 +5,5 @@ libniriodevenum.so - \usr\local\natinst\lib
 libniriosession.so - \usr\local\natinst\lib
 libNiRioSrv.so - \usr\local\natinst\lib
 libRoboRIO_FRC_ChipObject.so - \usr\local\frc\lib
-libvisa.so - \usr\local\vxipnp\linux\lib\
+libvisa.so - \usr\lib\arm-linux-gnueabi
 libnirio_emb_can.so - \usr\local\natinst\lib
