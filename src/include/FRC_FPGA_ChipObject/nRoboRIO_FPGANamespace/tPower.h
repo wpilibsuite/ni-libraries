@@ -1,15 +1,15 @@
 // Copyright (c) National Instruments 2008.  All Rights Reserved.
 // Do Not Edit... this file is generated!
 
-#ifndef __nFRC_2022_22_0_0_Power_h__
-#define __nFRC_2022_22_0_0_Power_h__
+#ifndef __nFRC_2022_22_1_0_Power_h__
+#define __nFRC_2022_22_1_0_Power_h__
 
 #include "../tSystem.h"
 #include "../tSystemInterface.h"
 
 namespace nFPGA
 {
-namespace nFRC_2022_22_0_0
+namespace nFRC_2022_22_1_0
 {
 
 class tPower
@@ -171,6 +171,14 @@ public:
 
    typedef enum
    {
+   } tBrownoutVoltage250mV_IfaceConstants;
+
+   virtual void writeBrownoutVoltage250mV(unsigned char value, tRioStatusCode *status) = 0;
+   virtual unsigned char readBrownoutVoltage250mV(tRioStatusCode *status) = 0;
+
+
+   typedef enum
+   {
    } tAOVoltage_IfaceConstants;
 
    virtual unsigned short readAOVoltage(tRioStatusCode *status) = 0;
@@ -218,4 +226,4 @@ private:
 }
 }
 
-#endif // __nFRC_2022_22_0_0_Power_h__
+#endif // __nFRC_2022_22_1_0_Power_h__
