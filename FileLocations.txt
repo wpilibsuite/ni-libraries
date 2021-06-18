@@ -1,9 +1,3 @@
 libFRC_NetworkCommunication.so - \usr\local\frc\lib
-libNiFpga.so - \usr\local\natinst\lib
-libNiFpgaLv.so - \usr\local\natinst\lib
-libniriodevenum.so - \usr\local\natinst\lib
-libniriosession.so - \usr\local\natinst\lib
-libNiRioSrv.so - \usr\local\natinst\lib
 libRoboRIO_FRC_ChipObject.so - \usr\local\frc\lib
 libvisa.so - \usr\lib\arm-linux-gnueabi
-libnirio_emb_can.so - \usr\local\natinst\lib

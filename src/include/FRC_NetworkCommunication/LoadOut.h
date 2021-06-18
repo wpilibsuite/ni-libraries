@@ -31,6 +31,7 @@ namespace nLoadOut
         kTargetClass_FRC2 = 0x20,
         kTargetClass_FRC3 = 0x30,
         kTargetClass_RoboRIO = 0x40,
+        kTargetClass_RoboRIO2 = 0x50,
 #if defined(__vxworks) || defined(SIMULATION)
         kTargetClass_FRC2_Analog = kTargetClass_FRC2 | kModuleType_Analog,
         kTargetClass_FRC2_Digital = kTargetClass_FRC2 | kModuleType_Digital,
