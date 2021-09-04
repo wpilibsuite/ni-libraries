@@ -6,6 +6,7 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
+    container: wpilib/roborio-cross-ubuntu:2021-18.04
     steps:
       - uses: actions/checkout@v2
         with:
