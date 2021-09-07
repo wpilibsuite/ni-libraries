@@ -5,7 +5,7 @@ ext.createComponentZipTasks = { components, names, base, type, project, func ->
         if (it in NativeLibrarySpec && stringNames.contains(it.name)) {
             it.binaries.each {
                 if (!it.buildable) return
-                    def target = nativeUtils.getPublishClassifier(it)
+                def target = nativeUtils.getPublishClassifier(it)
                 if (configMap.containsKey(target)) {
                     configMap.get(target).add(it)
                 } else {
@@ -27,6 +27,17 @@ ext.createComponentZipTasks = { components, names, base, type, project, func ->
 
             func(it, value)
         }
+
+        if (key.contains('debug')) {
+            project.tasks['runtimeLibDebug'].configure {
+                func(it, value)
+            }
+        } else {
+            project.tasks['runtimeLib'].configure {
+                func(it, value)
+            }
+        }
+
         taskList.add(task)
 
         project.build.dependsOn task

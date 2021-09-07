@@ -175,7 +175,7 @@ ext.addTaskToCopyAllOutputs = { task ->
     copyAllOutputs.from task.archivePath
 }
 
-def pubVersion = '2022.2.1'
+def pubVersion = '2022.2.2'
 
 def baseArtifactId = 'chipobject'
 def artifactGroupId = 'edu.wpi.first.ni-libraries'
@@ -310,6 +310,18 @@ task netCommHeaders(type: Zip) {
     }
 }
 
+task runtimeLib(type: Zip) {
+    destinationDirectory = outputsFolder
+    archiveBaseName = runtimeZipBaseName
+    classifier = "linuxathena"
+}
+
+task runtimeLibDebug(type: Zip) {
+    destinationDirectory = outputsFolder
+    archiveBaseName = runtimeZipBaseName
+    classifier = "linuxathenadebug"
+}
+
 build.dependsOn netCommLib
 build.dependsOn headersZip
 build.dependsOn netCommHeaders
@@ -319,6 +331,8 @@ build.dependsOn netCommLibDebug
 build.dependsOn visaLib
 build.dependsOn visaLibDebug
 build.dependsOn visaHeaders
+build.dependsOn runtimeLib
+build.dependsOn runtimeLibDebug
 
 addTaskToCopyAllOutputs(netCommLib)
 addTaskToCopyAllOutputs(headersZip)
@@ -326,6 +340,8 @@ addTaskToCopyAllOutputs(libZip)
 addTaskToCopyAllOutputs(netCommHeaders)
 addTaskToCopyAllOutputs(libZipDebug)
 addTaskToCopyAllOutputs(netCommLibDebug)
+addTaskToCopyAllOutputs(runtimeLib)
+addTaskToCopyAllOutputs(runtimeLibDebug)
 
 addTaskToCopyAllOutputs(visaLib)
 addTaskToCopyAllOutputs(visaLibDebug)
@@ -333,19 +349,7 @@ addTaskToCopyAllOutputs(visaHeaders)
 
 model {
     publishing {
-        def taskList = createComponentZipTasks($.components, ['embcanshim', 'fpgalvshim'], runtimeZipBaseName, Zip, project, includeStandardZipFormat)
-
-        publications {
-            runtime(MavenPublication) {
-                taskList.each {
-                    artifact it
-                }
-
-                artifactId = "${runtimeBaseArtifactId}"
-                groupId artifactGroupId
-                version pubVersion
-            }
-        }
+        def taskList = createComponentZipTasks($.components, ['embcanshim', 'fpgalvshim'], 'DoNotPublishRuntime', Zip, project, includeStandardZipFormat)
     }
 }
 
@@ -375,6 +379,14 @@ publishing {
             artifact visaLibDebug
 
             artifactId = "${visaBaseArtifactId}"
+            groupId artifactGroupId
+            version pubVersion
+        }
+        runtime(MavenPublication) {
+            artifact runtimeLib
+            artifact runtimeLibDebug
+
+            artifactId = "${runtimeBaseArtifactId}"
             groupId artifactGroupId
             version pubVersion
         }
