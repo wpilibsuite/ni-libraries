@@ -4,7 +4,7 @@ plugins {
     id 'base'
     id 'maven-publish'
     id "com.jfrog.artifactory" version "4.9.8"
-    id 'edu.wpi.first.NativeUtils' version '2021.1.1'
+    id 'edu.wpi.first.NativeUtils' version '2022.6.1'
     id 'cpp'
     id 'c'
 }
@@ -45,8 +45,9 @@ if (System.getenv()['RUN_AZURE_ARTIFACTORY_RELEASE'] != null) {
   publish.dependsOn artifactoryPublish
 }
 
-nativeUtils.addWpiNativeUtils()
 nativeUtils.withRoboRIO()
+
+nativeUtils.addWpiNativeUtils()
 
 nativeUtils.wpi.addWarnings()
 nativeUtils.wpi.addWarningsAsErrors()
@@ -427,5 +428,5 @@ task patchNiLibraries() {
 }
 
 wrapper {
-  gradleVersion = '6.0.1'
+  gradleVersion = '7.2'
 }
