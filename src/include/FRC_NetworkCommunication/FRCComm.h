@@ -91,6 +91,7 @@ extern "C" {
 	int EXPORT_FUNC FRC_NetworkCommunication_Reserve(void *instance);
 #ifndef SIMULATION
 	void EXPORT_FUNC getFPGAHardwareVersion(uint16_t *fpgaVersion, uint32_t *fpgaRevision);
+	void EXPORT_FUNC FRC_NetworkCommunication_getFPGAFileName(char *fileName);
 #endif
 	/**
 	 * Safely copy data into the status packet to be sent back to the driver station.
@@ -152,6 +153,7 @@ extern "C" {
 	int EXPORT_FUNC FRC_NetworkCommunication_setJoystickOutputs(uint8_t joystickNum, uint32_t hidOutputs, uint16_t leftRumble, uint16_t rightRumble);
 	int EXPORT_FUNC FRC_NetworkCommunication_getJoystickDesc(uint8_t joystickNum, uint8_t *isXBox, uint8_t *type, char *name,
 		uint8_t *axisCount, uint8_t *axisTypes, uint8_t *buttonCount, uint8_t *povCount);
+	int EXPORT_FUNC FRC_NetworkCommunication_getPDPType(uint8_t *pdpType);
 
 	void EXPORT_FUNC FRC_NetworkCommunication_getVersionString(char *version);
 	int EXPORT_FUNC FRC_NetworkCommunication_observeUserProgramStarting(void);
