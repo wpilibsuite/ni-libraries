@@ -175,7 +175,7 @@ ext.addTaskToCopyAllOutputs = { task ->
     copyAllOutputs.from task.archivePath
 }
 
-def pubVersion = '2022.2.3'
+def pubVersion = '2022.4.0'
 
 def baseArtifactId = 'chipobject'
 def artifactGroupId = 'edu.wpi.first.ni-libraries'
