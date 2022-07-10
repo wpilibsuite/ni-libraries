@@ -222,9 +222,6 @@ task libZip(type: Zip) {
     from('src/lib/chipobject') {
         into '/linux/athena/shared/'
     }
-    from ('RequiredVersion.txt') {
-        into '/'
-    }
 }
 
 task libZipDebug(type: Zip) {
@@ -234,9 +231,6 @@ task libZipDebug(type: Zip) {
 
     from('src/lib/chipobject') {
         into '/linux/athena/shared/'
-    }
-    from ('RequiredVersion.txt') {
-        into '/'
     }
 }
 
