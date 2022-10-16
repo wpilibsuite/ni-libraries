@@ -24,7 +24,7 @@ jobs:
       - name: Publish (Main)
         run: |
           ./gradlew publish
-          ./gradlew publish -PreleaseRepoPublish
+          ./gradlew clean publish -PreleaseRepoPublish
         env:
           RUN_AZURE_ARTIFACTORY_RELEASE: TRUE
           ARTIFACTORY_PUBLISH_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
