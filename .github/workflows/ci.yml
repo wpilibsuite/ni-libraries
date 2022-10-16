@@ -23,7 +23,7 @@ jobs:
 
       - name: Publish (Main)
         run: |
-          ./gradlew publish
+          ./gradlew publish &&
           ./gradlew publish -PreleaseRepoPublish
         env:
           RUN_AZURE_ARTIFACTORY_RELEASE: TRUE
