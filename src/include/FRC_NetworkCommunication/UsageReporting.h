@@ -114,6 +114,14 @@ namespace nUsageReporting
         kResourceType_DutyCycle,
         kResourceType_AddressableLEDs,
         kResourceType_FusionVenom,
+        kResourceType_CTRE_future7,
+        kResourceType_CTRE_future8,
+        kResourceType_CTRE_future9,
+        kResourceType_CTRE_future10,
+        kResourceType_CTRE_future11,
+        kResourceType_CTRE_future12,
+        kResourceType_CTRE_future13, // 100
+        kResourceType_CTRE_future14,
     } tResourceType;
 
     typedef enum

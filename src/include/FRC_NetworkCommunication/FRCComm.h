@@ -39,6 +39,11 @@
 # define __DEPRECATED__ __attribute__((__deprecated__))
 #endif
 
+#define kTcpRecvMask_Joysticks      0x000000FF
+#define kTcpRecvMask_MatchInfoOld   0x00000100
+#define kTcpRecvMask_MatchInfo      0x00000200
+#define kTcpRecvMask_GameSpecific   0x00000400
+
 enum AllianceStationID_t {
 	kAllianceStationID_red1,
 	kAllianceStationID_red2,
@@ -132,14 +137,19 @@ extern "C" {
 
 #ifdef _WIN32
 	void EXPORT_FUNC setNewDataSem(HANDLE);
+	void EXPORT_FUNC FRC_NetworkCommunication_setNewTcpDataSem(HANDLE);
 #elif defined (__vxworks)
 	void EXPORT_FUNC setNewDataSem(SEM_ID);
+	void EXPORT_FUNC FRC_NetworkCommunication_setNewTcpDataSem(SEM_ID);
 #else
 	void EXPORT_FUNC setNewDataSem(pthread_cond_t *);
+	void EXPORT_FUNC FRC_NetworkCommunication_setNewTcpDataSem(pthread_cond_t *);
 #endif
 
 	// this uint32_t is really a LVRefNum
 	int EXPORT_FUNC setNewDataOccurRef(uint32_t refnum);
+	int EXPORT_FUNC FRC_NetworkCommunication_setNewTcpDataOccurRef(uint32_t refnum);
+	uint32_t EXPORT_FUNC FRC_NetworkCommunication_getNewTcpRecvMask();
 	
 	int EXPORT_FUNC FRC_NetworkCommunication_getControlWord(struct ControlWord_t *controlWord); // Low-latency
 	int EXPORT_FUNC FRC_NetworkCommunication_getWatchdogActive(void); // Low-latency

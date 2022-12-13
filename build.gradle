@@ -3,8 +3,8 @@ import org.gradle.nativeplatform.NativeDependencySet
 plugins {
     id 'base'
     id 'maven-publish'
-    id "com.jfrog.artifactory" version "4.16.0"
-    id 'edu.wpi.first.NativeUtils' version '2023.2.4'
+    id "com.jfrog.artifactory" version "4.29.3"
+    id 'edu.wpi.first.NativeUtils' version '2023.9.0'
     id 'cpp'
     id 'c'
 }
@@ -175,7 +175,7 @@ ext.addTaskToCopyAllOutputs = { task ->
     copyAllOutputs.from task.archivePath
 }
 
-def pubVersion = '2023.1.0'
+def pubVersion = '2023.2.0'
 
 def baseArtifactId = 'chipobject'
 def artifactGroupId = 'edu.wpi.first.ni-libraries'

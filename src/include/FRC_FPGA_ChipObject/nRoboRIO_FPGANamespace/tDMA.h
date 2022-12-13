@@ -1,15 +1,15 @@
 // Copyright (c) National Instruments 2008.  All Rights Reserved.
 // Do Not Edit... this file is generated!
 
-#ifndef __nFRC_2022_22_2_0_DMA_h__
-#define __nFRC_2022_22_2_0_DMA_h__
+#ifndef __nFRC_2023_23_0_0_DMA_h__
+#define __nFRC_2023_23_0_0_DMA_h__
 
 #include "../tSystem.h"
 #include "../tSystemInterface.h"
 
 namespace nFPGA
 {
-namespace nFRC_2022_22_2_0
+namespace nFRC_2023_23_0_0
 {
 
 class tDMA
@@ -203,4 +203,4 @@ private:
 }
 }
 
-#endif // __nFRC_2022_22_2_0_DMA_h__
+#endif // __nFRC_2023_23_0_0_DMA_h__
