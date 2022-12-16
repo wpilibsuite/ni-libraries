@@ -4,7 +4,7 @@ plugins {
     id 'base'
     id 'maven-publish'
     id "com.jfrog.artifactory" version "4.29.3"
-    id 'edu.wpi.first.NativeUtils' version '2023.9.0'
+    id 'edu.wpi.first.NativeUtils' version '2023.10.0'
     id 'cpp'
     id 'c'
 }
@@ -175,7 +175,7 @@ ext.addTaskToCopyAllOutputs = { task ->
     copyAllOutputs.from task.archivePath
 }
 
-def pubVersion = '2023.2.0'
+def pubVersion = '2023.2.1'
 
 def baseArtifactId = 'chipobject'
 def artifactGroupId = 'edu.wpi.first.ni-libraries'
@@ -316,6 +316,14 @@ task runtimeLibDebug(type: Zip) {
     classifier = "linuxathenadebug"
 }
 
+task imageZip(type: Zip) {
+    destinationDirectory = outputsFolder
+    archiveBaseName = runtimeZipBaseName
+    classifier = "allowedimages"
+
+    from('allowed_images.txt')
+}
+
 build.dependsOn netCommLib
 build.dependsOn headersZip
 build.dependsOn netCommHeaders
@@ -327,6 +335,7 @@ build.dependsOn visaLibDebug
 build.dependsOn visaHeaders
 build.dependsOn runtimeLib
 build.dependsOn runtimeLibDebug
+build.dependsOn imageZip
 
 addTaskToCopyAllOutputs(netCommLib)
 addTaskToCopyAllOutputs(headersZip)
@@ -340,6 +349,8 @@ addTaskToCopyAllOutputs(runtimeLibDebug)
 addTaskToCopyAllOutputs(visaLib)
 addTaskToCopyAllOutputs(visaLibDebug)
 addTaskToCopyAllOutputs(visaHeaders)
+
+addTaskToCopyAllOutputs(imageZip)
 
 model {
     publishing {
@@ -379,6 +390,7 @@ publishing {
         runtime(MavenPublication) {
             artifact runtimeLib
             artifact runtimeLibDebug
+            artifact imageZip
 
             artifactId = "${runtimeBaseArtifactId}"
             groupId artifactGroupId
