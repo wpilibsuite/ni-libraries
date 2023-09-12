@@ -17,32 +17,33 @@ namespace nFPGA
 class tSystem
 {
 public:
-   tSystem(tRioStatusCode *status);
-   ~tSystem();
-   void getFpgaGuid(uint32_t *guid_ptr, tRioStatusCode *status);
-   void reset(tRioStatusCode *status);
+    tSystem(tRioStatusCode* status);
+    ~tSystem();
+    void getFpgaGuid(uint32_t* guid_ptr, tRioStatusCode* status);
+    void reset(tRioStatusCode* status);
 
 protected:
-   static NiFpga_Session _DeviceHandle;
+    static NiFpga_Session _DeviceHandle;
 
 #ifdef FRC_FPGA_PRELOAD_BITFILE
-   void NiFpga_SharedOpen_common(const char*     bitfile);
-   NiFpga_Status NiFpga_SharedOpen(const char*     bitfile,
-                            const char*     signature,
-                            const char*     resource,
-                            uint32_t        attribute,
-                            NiFpga_Session* session);
-   NiFpga_Status NiFpgaLv_SharedOpen(const char* const     bitfile,
-                            const char* const     apiSignature,
-                            const char* const     resource,
-                            const uint32_t        attribute,
-                            NiFpga_Session* const session);
+    void NiFpga_SharedOpen_common(const char* bitfile);
+    NiFpga_Status NiFpga_SharedOpen(const char* bitfile,
+        const char* signature,
+        const char* resource,
+        uint32_t attribute,
+        NiFpga_Session* session);
+    NiFpga_Status NiFpgaLv_SharedOpen(const char* const bitfile,
+        const char* const apiSignature,
+        const char* const resource,
+        const uint32_t attribute,
+        NiFpga_Session* const session);
+
 private:
-    static char *_FileName;
-    static char *_Bitfile;
+    static char* _FileName;
+    static char* _Bitfile;
 #endif
 };
 
-}
+} // namespace nFPGA
 
 #endif // __tSystem_h__

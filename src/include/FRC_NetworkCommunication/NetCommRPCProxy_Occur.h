@@ -1,10 +1,11 @@
 #pragma once
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-void NetCommRPCProxy_SetOccurFuncPointer(void (*Occur)(uint32_t));
+    void NetCommRPCProxy_SetOccurFuncPointer(void (*Occur)(uint32_t));
 
 #ifdef __cplusplus
 }

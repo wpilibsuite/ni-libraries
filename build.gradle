@@ -409,10 +409,6 @@ task patchNiLibraries() {
             file.write(contents, 'UTF-8')
         }
 
-        // Patch HMB header to be rooted correctly
-        File hmbFile = file("$rootDir/src/include/FRC_FPGA_ChipObject/fpgainterfacecapi/NiFpga_HMB.h")
-        hmbFile.text = hmbFile.text.replaceAll('#include "fpgainterfacecapi/NiFpga.h"', '#include "FRC_FPGA_ChipObject/fpgainterfacecapi/NiFpga.h"')
-
         // Patch NetComm headers to work on Windows
         FileTree netTree = fileTree(dir: "$rootDir/src/include/FRC_NetworkCommunication")
         netTree.each { File file ->

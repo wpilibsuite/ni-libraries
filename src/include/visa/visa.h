@@ -34,7 +34,7 @@
 #include "visatype.h"
 #endif
 
-#define VI_SPEC_VERSION     (0x00500800UL)
+#define VI_SPEC_VERSION     (0x00700000UL)
 
 #if defined(__cplusplus) || defined(__cplusplus__)
    extern "C" {

@@ -8,10 +8,10 @@
 
 struct tDMAChannelDescriptor
 {
-   uint32_t channel;
-   uint32_t baseAddress;
-   uint32_t depth;
-   bool targetToHost;
+    uint32_t channel;
+    uint32_t baseAddress;
+    uint32_t depth;
+    bool targetToHost;
 };
 
 #endif // __tDMAChannelDescriptor_h__

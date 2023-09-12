@@ -1,10 +1,11 @@
 /*
- * FPGA Interface C API 19.0 header file.
+ * FPGA Interface C API 23.3 header file.
  *
- * Copyright (c) 2019,
+ * Copyright (c) 2023,
  * National Instruments Corporation.
  * All rights reserved.
  */
+
 
 #ifndef __NiFpga_h__
 #define __NiFpga_h__
@@ -68,6 +69,7 @@
    || defined(__ppc)
    #if defined(__vxworks)
       #define NiFpga_VxWorks 1
+      #error VxWorks is no longer supported by the FPGA Interface C API
    #else
       #error Unsupported OS.
    #endif
@@ -172,9 +174,6 @@
  || defined(_MSC_STDINT_H_) \
  || defined(_PSTDINT_H_INCLUDED)
    /* Assume that exact-width integer types have already been defined. */
-#elif NiFpga_VxWorks
-   /* VxWorks (at least 6.3 and earlier) did not have stdint.h. */
-   #include <types/vxTypes.h>
 #elif NiFpga_C99 \
    || NiFpga_Gcc /* GCC (at least since 3.0) has a stdint.h. */ \
    || defined(HAVE_STDINT_H)
@@ -454,6 +453,19 @@ static const NiFpga_Status NiFpga_Status_CloseAndResetCalledWithResetNotSupporte
 static const NiFpga_Status NiFpga_Status_InternalError = -61499;
 
 /**
+ * DMA from host to FPGA target is not supported for this remote system. Use
+ * another method for I/O or change the controller associated with the FPGA
+ * target.
+ */
+static const NiFpga_Status NiFpga_Status_DmaOutputNotSupported = -63001;
+
+/**
+ * The specified DMA FIFO depth is greater than the maximum size supported by
+ * this system.
+ */
+static const NiFpga_Status NiFpga_Status_DmaFifoDepthNotSupported = -63002;
+
+/**
  * The NI-RIO driver was unable to allocate memory for a FIFO. This can happen
  * when the combined depth of all DMA FIFOs exceeds the maximum depth for the
  * controller, or when the controller runs out of system memory. You may be able
@@ -463,10 +475,41 @@ static const NiFpga_Status NiFpga_Status_InternalError = -61499;
 static const NiFpga_Status NiFpga_Status_TotalDmaFifoDepthExceeded = -63003;
 
 /**
- * Access to the remote system was denied. Use MAX to check the Remote Device
- * Access settings under Software>>NI-RIO>>NI-RIO Settings on the remote system.
+ * Operation failed due to device reconfiguration. Multiple sessions to FPGA
+ * devices are not supported. Close the other session and retry this operation.
+ */
+static const NiFpga_Status NiFpga_Status_DeviceReconfigured = -63030;
+
+/**
+ * The operation could not be completed because another session is accessing the
+ * device. Close all other sessions and retry.
+ */
+static const NiFpga_Status NiFpga_Status_DeviceInvariant = -63031;
+
+/**
+ * Access to the remote system was denied. If you are trying to connect to an RT
+ * target, use MAX to check the Remote Device Access settings under
+ * Software>>[Recommended software set, such as "NI CompactRIO version -
+ * date"]>>NI-RIO>>NI-RIO Settings on the remote system. If you are trying to
+ * connect to a desktop Linux target, check the settings in
+ * /etc/natinst/nirio/nirio.ini on the Linux target.
  */
 static const NiFpga_Status NiFpga_Status_AccessDenied = -63033;
+
+/**
+ * The attempt to open a RIO session failed because the driver was not yet
+ * initialized.
+ */
+static const NiFpga_Status NiFpga_Status_DriverNotInitialized = -63035;
+
+/**
+ * The operation could not be completed because the device being accessed was
+ * unavailable, either because it was disconnected from the network or because
+ * power was removed (e.g., the system went into a low-power state). Close any
+ * RIO FPGA sessions; check network, USB, and power connections; power-cycle the
+ * device if necessary; and open a new RIO session.
+ */
+static const NiFpga_Status NiFpga_Status_ResourceRemoved = -63036;
 
 /**
  * The NI-RIO software on the host is not compatible with the software on the
@@ -477,16 +520,99 @@ static const NiFpga_Status NiFpga_Status_HostVersionMismatch = -63038;
 
 /**
  * A connection could not be established to the specified remote device. Ensure
- * that the device is on and accessible over the network, that NI-RIO software
- * is installed, and that the RIO server is running and properly configured.
+ * that the device is on and accessible over the network, that the device is not
+ * in safe mode, that NI-RIO software is installed, and that the RIO server is
+ * running and properly configured.  Refer to Software>>NI-RIO>>NI-RIO Settings
+ * under the system in MAX.
  */
 static const NiFpga_Status NiFpga_Status_RpcConnectionError = -63040;
 
 /**
- * The RPC session is invalid. The target may have reset or been rebooted. Check
- * the network connection and retry the operation.
+ * The connection to the remote device has been lost due to an error on the
+ * remote device. Retry the operation. If the remote device continues to report
+ * this error, check its power supply and look for diagnostic messages on the
+ * console.
+ */
+static const NiFpga_Status NiFpga_Status_RpcServerError = -63041;
+
+/**
+ * A fault on the network caused the operation to fail.
+ */
+static const NiFpga_Status NiFpga_Status_NetworkFault = -63042;
+
+/**
+ * The session is invalid. The target may have been reset or rebooted, or the
+ * network connection may have timed out because of processor overuse. Check the
+ * network connection, reduce the demand on the processor, and decrease the
+ * timeout of the operation that failed. If the problem persists, visit
+ * ni.com/info and enter the Info Code expd6p.
  */
 static const NiFpga_Status NiFpga_Status_RpcSessionError = -63043;
+
+/**
+ * The RIO server could not be found on the specified remote device. Ensure that
+ * NI-RIO software is installed and that the RIO server is running and properly
+ * configured.  Refer to Software>>NI-RIO>>NI-RIO Settings under the system in
+ * MAX.
+ */
+static const NiFpga_Status NiFpga_Status_RpcServerMissing = -63044;
+
+/**
+ * The requested feature is not supported when using a remote RIO session.
+ * Opening a remote RIO session occurs when the resource string is specified as
+ * rio://hostname/device_name.  A local session can be opened by specifying just
+ * the device_name.
+ */
+static const NiFpga_Status NiFpga_Status_FeatureNotSupportedOverRpc = -63045;
+
+/**
+ * The specified trigger line is already reserved. Consult the MAX Trigger
+ * settings or the trigger reservations for each device within the system.
+ */
+static const NiFpga_Status NiFpga_Status_TriggerReserved = -63050;
+
+/**
+ * The specified trigger line is not reserved in the current session.
+ */
+static const NiFpga_Status NiFpga_Status_TriggerNotReserved = -63051;
+
+/**
+ * Trigger lines are not supported or enabled. For PXI, identify the controller
+ * and chassis using MAX.
+ */
+static const NiFpga_Status NiFpga_Status_TriggerNotSupported = -63052;
+
+/**
+ * The specified event type is invalid.
+ */
+static const NiFpga_Status NiFpga_Status_EventInvalid = -63070;
+
+/**
+ * The specified RIO event has already been enabled for this session.
+ */
+static const NiFpga_Status NiFpga_Status_EventEnabled = -63071;
+
+/**
+ * The specified RIO event has not been enabled for this session. Attempting a
+ * Wait on IRQ after an Abort causes this error.
+ */
+static const NiFpga_Status NiFpga_Status_EventNotEnabled = -63072;
+
+/**
+ * The specified event did not occur within the specified time period, in
+ * milliseconds. Extend the time period, or ignore if the result was expected.
+ */
+static const NiFpga_Status NiFpga_Status_EventTimedOut = -63073;
+
+/**
+ * The allocated buffer is too small.
+ */
+static const NiFpga_Status NiFpga_Status_BufferInvalidSize = -63080;
+
+/**
+ * The caller did not allocate a memory buffer.
+ */
+static const NiFpga_Status NiFpga_Status_BufferNotAllocated = -63081;
 
 /**
  * The operation could not complete because another session is accessing the
@@ -508,15 +634,32 @@ static const NiFpga_Status NiFpga_Status_FifoElementsCurrentlyAcquired = -63083;
 static const NiFpga_Status NiFpga_Status_MisalignedAccess = -63084;
 
 /**
- * The FPGA Read/Write Control Function is accessing a control or indicator
- * with data that exceeds the maximum size supported on the current target.
- * Refer to the hardware documentation for the limitations on data types for
- * this target.
+ * The FPGA Read/Write Control Function is accessing a control or indicator with
+ * data that exceeds the maximum size supported on the current target. Refer to
+ * the hardware documentation for the limitations on data types for this target.
  */
 static const NiFpga_Status NiFpga_Status_ControlOrIndicatorTooLarge = -63085;
 
 /**
- * A valid .lvbitx bitfile is required. If you are using a valid .lvbitx
+ * The FIFO function called cannot be used while the FIFO is running. To use
+ * this function, ensure the FIFO is stopped.
+ */
+static const NiFpga_Status NiFpga_Status_OperationNotSupportedWhileStarted = -63086;
+
+/**
+ * The function called does not match the datatype of the specified property.
+ * Ensure you are calling the correct function for the property.
+ */
+static const NiFpga_Status NiFpga_Status_TypesDoNotMatch = -63087;
+
+/**
+ * Cannot acquire more regions from the selected FIFO. Release some regions and
+ * try again.
+ */
+static const NiFpga_Status NiFpga_Status_OutOfFifoRegions = -63088;
+
+/**
+ * A valid .lvbitx bitfile is required. If you are using a vaild .lvbitx
  * bitfile, the bitfile may not be compatible with the software you are using.
  * Determine which version of LabVIEW was used to make the bitfile, update your
  * software to that version or later, and try again.
@@ -524,32 +667,129 @@ static const NiFpga_Status NiFpga_Status_ControlOrIndicatorTooLarge = -63085;
 static const NiFpga_Status NiFpga_Status_BitfileReadError = -63101;
 
 /**
- * The specified signature does not match the signature of the bitfile. If the
- * bitfile has been recompiled, regenerate the C API and rebuild the
- * application.
+ * Invalid output directory.
+ */
+static const NiFpga_Status NiFpga_Status_InvalidOutputDirectory = -63102;
+
+/**
+ * Invalid prefix override. Prefixes must include only alphanumerics and
+ * underscores.
+ */
+static const NiFpga_Status NiFpga_Status_InvalidPrefixOverride = -63103;
+
+/**
+ * Could not convert "%s" to a valid C/C++ identifier.
+ */
+static const NiFpga_Status NiFpga_Status_NoSuitableIdentifier = -63104;
+
+/**
+ * The C/C++ identifier "%s" is already in use and could not be created.
+ */
+static const NiFpga_Status NiFpga_Status_IdentifierConflict = -63105;
+
+/**
+ * The specified bitfile is not the bitfile used to generate the C API. Specify
+ * the original bitfile or regenerate the C API for this bitfile.
  */
 static const NiFpga_Status NiFpga_Status_SignatureMismatch = -63106;
 
 /**
- * The bitfile you are trying to use is incompatible with the version
- * of NI-RIO installed on the target and/or host. Update the version
- * of NI-RIO on the target and/or host to the same version (or later)
- * used to compile the bitfile. Alternatively, recompile the bitfile
- * with the same version of NI-RIO that is currently installed on the
- * target and/or host.
+ * The bitfile you are trying to use is incompatible with the version of NI-RIO
+ * installed on the target and/or host. Update the version of NI-RIO on the
+ * target and/or host to the same version (or later) used to compile the
+ * bitfile. Alternatively, recompile the bitfile with the same version of NI-RIO
+ * that is currently installed on the target and/or host.
  */
 static const NiFpga_Status NiFpga_Status_IncompatibleBitfile = -63107;
 
 /**
- * A hardware failure has occurred. The operation could not be completed as
- * specified.
+ * An unspecified hardware failure has occurred. The operation could not be
+ * completed.
  */
 static const NiFpga_Status NiFpga_Status_HardwareFault = -63150;
 
 /**
- * Either the supplied resource name is invalid as a RIO resource name, or the
- * device was not found. Use MAX to find the proper resource name for the
- * intended device.
+ * You must download the bitfile to the flash memory on the FPGA device before
+ * you can set when the bitfile is autoloaded. Download the bitfile to the flash
+ * memory then try again.
+ */
+static const NiFpga_Status NiFpga_Status_NoBitfilePresentOnFlash = -63160;
+
+/**
+ * The device has shut down to protect against excessive power consumption.
+ * Check airflow and cooling and reboot the system. To avoid this error, monitor
+ * the power consumption, power shutdown threshold, and margin of the device. If
+ * necessary, reduce FPGA power consumption.
+ */
+static const NiFpga_Status NiFpga_Status_PowerShutdown = -63170;
+
+/**
+ * The device has shut down to protect against excessive FPGA temperature. Check
+ * airflow and cooling and reboot the system. To avoid this error, monitor the
+ * FPGA temperature, temperature shutdown threshold, and margin of the FPGA. If
+ * necessary, reduce FPGA temperature.
+ */
+static const NiFpga_Status NiFpga_Status_ThermalShutdown = -63171;
+
+/**
+ * The alias name is invalid. A valid alias name must meet the following
+ * conditions:  1) Cannot be or contain a reserved word. 2) Can use only
+ * alphanumeric characters, hyphens, and underscores. 3) Cannot conflict with
+ * the default alias of another device. A default alias is the name that the NI-
+ * RIO Device Driver assigns to a device based on its attributes if you have not
+ * assigned a custom alias to the device using MAX or the System Configuration
+ * API. For example, 'PXI1Slot3' is the default alias for the device at Slot 3
+ * of PXI Chassis 1, and it cannot be used as an alias name for any other
+ * device. Refer to the LabVIEW Help for NI-RIO for more information about
+ * aliases.
+ */
+static const NiFpga_Status NiFpga_Status_InvalidAliasName = -63180;
+
+/**
+ * The supplied alias was not found.
+ */
+static const NiFpga_Status NiFpga_Status_AliasNotFound = -63181;
+
+/**
+ * An invalid device access setting was specified. RIO device access patterns
+ * may contain only alphanumerics, '-', '_', '.', and '*'.
+ */
+static const NiFpga_Status NiFpga_Status_InvalidDeviceAccess = -63182;
+
+/**
+ * An invalid port was specified. The RIO server port must be between 0 and
+ * 65535, where 0 indicates a dynamically assigned port. Port 3580 is reserved
+ * and cannot be used.
+ */
+static const NiFpga_Status NiFpga_Status_InvalidPort = -63183;
+
+/**
+ * The selected bitfile requires a driver that could not be loaded or that was
+ * invalid. Use MAX to install all necessary software to your target. Note that
+ * if your project includes modules under the chassis item, user-defined
+ * variables, or references to the Scan Clock Chassis I/O item, you must install
+ * NI-RIO IO Scan software to the target.
+ */
+static const NiFpga_Status NiFpga_Status_ChildDeviceNotInserted = -63184;
+
+/**
+ * This remote system does not support connections to other remote systems.
+ */
+static const NiFpga_Status NiFpga_Status_RemoteTarget = -63187;
+
+/**
+ * The operation is no longer supported.
+ */
+static const NiFpga_Status NiFpga_Status_DeprecatedFunction = -63188;
+
+/**
+ * The supplied search pattern is invalid.
+ */
+static const NiFpga_Status NiFpga_Status_InvalidPattern = -63189;
+
+/**
+ * The specified device was not found. Use MAX or System Designer to find the
+ * proper resource name for the intended device.
  */
 static const NiFpga_Status NiFpga_Status_InvalidResourceName = -63192;
 
@@ -565,15 +805,33 @@ static const NiFpga_Status NiFpga_Status_FeatureNotSupported = -63193;
 static const NiFpga_Status NiFpga_Status_VersionMismatch = -63194;
 
 /**
- * The session is invalid or has been closed.
+ * The handle for device communication is invalid or has been closed. Restart
+ * the application.
  */
 static const NiFpga_Status NiFpga_Status_InvalidSession = -63195;
 
 /**
- * The maximum number of open FPGA sessions has been reached. Close some open
- * sessions.
+ * An invalid attribute has been specified.
+ */
+static const NiFpga_Status NiFpga_Status_InvalidAttribute = -63196;
+
+/**
+ * An invalid attribute value has been specified.
+ */
+static const NiFpga_Status NiFpga_Status_InvalidAttributeValue = -63197;
+
+/**
+ * The system has run out of resources. Close a session and retry the operation.
  */
 static const NiFpga_Status NiFpga_Status_OutOfHandles = -63198;
+
+/**
+ * The session could not be opened because another session with a different
+ * bitfile is already open on the device. Close the current session before
+ * opening another.
+ */
+static const NiFpga_Status NiFpga_Status_CannotDownloadDifferentBitfile = -63199;
+
 
 /**
  * Tests whether a status is an error.
@@ -673,6 +931,10 @@ typedef struct NiFpga_FxpTypeInfo
  * @}
  */
 
+/** \addtogroup FXP
+ *  @{
+ */
+
 /**
  * Calculates the FXP delta as a float.  The delta is the smallest increment
  * that the FXP number can represent.
@@ -686,7 +948,7 @@ static NiFpga_Inline float NiFpga_CalculateFxpDeltaFloat(
                                           const NiFpga_FxpTypeInfo typeInfo)
 {
    const int32_t exponent = typeInfo.integerWordLength - typeInfo.wordLength;
-#if NiFpga_C99
+#if NiFpga_C99 && !NiFpga_Cvi
    return ldexpf(FLT_EPSILON, exponent + FLT_MANT_DIG - 1);
 #else
    return (float)ldexp((double)FLT_EPSILON, exponent + FLT_MANT_DIG - 1);
@@ -699,7 +961,8 @@ static NiFpga_Inline float NiFpga_CalculateFxpDeltaFloat(
  * future versions.
  */
 #define NiFpga_Private_FxpToFloatingPoint(typeInfo, delta, data) \
-   const uint64_t wordLengthMask = (1ULL << typeInfo.wordLength) - 1; \
+   const uint64_t wordLengthMask = typeInfo.wordLength != 64 \
+      ? (1ULL << typeInfo.wordLength) - 1 : 0xFFFFFFFFFFFFFFFFULL; \
    data &= wordLengthMask; \
    if (typeInfo.isSigned) \
    { \
@@ -712,7 +975,6 @@ static NiFpga_Inline float NiFpga_CalculateFxpDeltaFloat(
       } \
    } \
    return delta * data;
-
 
 /**
  * @}
@@ -792,7 +1054,8 @@ static NiFpga_Inline double NiFpga_ConvertFromFxpToDouble(
  * future versions.
  */
 #define NiFpga_Private_FloatingPointToFxp(typeInfo, delta, data) \
-   const uint64_t wordLengthMask = (1ULL << typeInfo.wordLength) - 1; \
+   const uint64_t wordLengthMask = typeInfo.wordLength != 64 \
+      ? (1ULL << typeInfo.wordLength) - 1 : 0xFFFFFFFFFFFFFFFFULL; \
    if (data < 0) \
    { \
       if (typeInfo.isSigned) \
@@ -919,8 +1182,34 @@ typedef uint32_t NiFpga_Session;
  */
 typedef enum
 {
+   /**
+    * By default the FPGA VI will start running when Open is called.
+    * This attribute will ensure the bitfile is loaded to the FPGA, but does not
+    * run the VI.  If the VI is already running on the FPGA, its state will not
+    * be changed.
+    */
    NiFpga_OpenAttribute_NoRun = 1,
-   NiFpga_OpenAttribute_BitfilePathIsUTF8 = 2
+   /**
+    * On windows the bitfile path is assumed to be encoded as the current
+    * codepage. This attribute will specify that the bitfile path is encoded as
+    * UTF-8. This parameter has no effect on Linux systems.
+    */
+   NiFpga_OpenAttribute_BitfilePathIsUTF8 = 2,
+   /**
+    * Causes the  bitfile argument passed in to be interpreted as the contents
+    * of the lvbitx file rather than a path to an lvbitx file.
+    */
+   NiFpga_OpenAttribute_BitfileContentsNotPath = 1u << 30,
+   /**
+    * Skips the check of the signature argument, which otherwise would ensure
+    * that users would not accidentally rebuild their bitfile (thereby getting
+    * new offsets, etc.) without also regenerating their C API and rebuilding
+    * their application with the new constants. This is useful if one is not
+    * using the FPGA Interface C API Generator to obtain resource information,
+    * such as by calling NiFpga_FindRegister or NiFpga_FindFifo.
+    * If using this attribute, pass `NULL` to `signature` instead.
+    */
+   NiFpga_OpenAttribute_IgnoreSignatureArgument = 1u << 31
 } NiFpga_OpenAttribute;
 
 /**
@@ -932,13 +1221,13 @@ typedef enum
  * directories for applications, you must pass an absolute path for the bitfile
  * parameter. If you pass only the filename instead of an absolute path, the
  * operating system may not be able to locate the bitfile. For example, the
- * default current working directories are C:/ni-rt/system/ for Phar Lap ETS and
- * /c/ for VxWorks. Because the generated *_Bitfile constant is a "#define" to a
+ * default current working directory is C:/ni-rt/system/ for Phar Lap ETS.s.
+ * Because the generated *_Bitfile constant is a "#define" to a
  * string literal, you can use C/C++ string-literal concatenation to form an
  * absolute path. For example, if the bitfile is in the root directory of a
  * Phar Lap ETS system, pass the following for the bitfile parameter.
  *
- *    "C:\\" NiFpga_MyApplication_Bitfile
+ *    \"C:\\\\\\\\\" NiFpga_MyApplication_Bitfile
  *
  * @param bitfile path to the bitfile
  * @param signature signature of the bitfile
@@ -973,6 +1262,55 @@ typedef enum
  */
 NiFpga_Status NiFpga_Close(NiFpga_Session session,
                            uint32_t       attribute);
+
+/**
+ * Returns the signature of the bitfile currently loaded on the FPGA. If the
+ * signature size specified is too small, signature size will be filled with
+ * the size required and NiFpga_Status_InvalidParameter will be returned.
+
+ * @param session handle to a currently open session
+ * @param signature the uint32_t array to fill with the signature value
+ * @param signatureSize the number of elements in signature
+ * @return result of the call
+ */
+NiFpga_Status NiFpga_GetBitfileSignature(NiFpga_Session session,
+                                         uint32_t* signature,
+                                         size_t*   signatureSize);
+
+/**
+ * Returns the offset of a control or indicator.  This offset can be used as the
+ * control or indicator parameter to a Read/Write or Read/WriteArray call.
+ * This intent of this function is to make sharing code that accesses the same
+ * interface implemented in different bitfiles easy.
+ *
+ * @warning Its possible to create a FPGA VI with multiple controls and
+ * indicators that have the same name. Attempting to find a control or indicator
+ * that shares a name is undefined behavior.
+ *
+ * @warning You must ensure you use the correct Read/Write call with the correct
+ * type for the register you have looked up.
+ *
+ * @param session handle to a currently open session
+ * @param registerName the name of the register to find
+ * @param registerOffset outputs the offset of the register
+ * @return result of the call
+ */
+NiFpga_Status NiFpga_FindRegister(NiFpga_Session session,
+                                  const char* registerName,
+                                  uint32_t* registerOffset);
+
+/**
+ * Returns the fifoNumber of a FIFO.  This fifoNumber can be used as the
+ * fifo parameter to a Read/WriteFifo or AcquireFifoRead/WriteElements call.
+ *
+ * @param session handle to a currently open session
+ * @param fifoName the name of the FIFO to find
+ * @param fifoNumber outputs the number of the FIFO
+ * @return result of the call
+ */
+NiFpga_Status NiFpga_FindFifo(NiFpga_Session session,
+                              const char* fifoName,
+                              uint32_t* fifoNumber);
 
 /**
  * @}
@@ -1024,6 +1362,41 @@ NiFpga_Status NiFpga_Reset(NiFpga_Session session);
  * @return result of the call
  */
 NiFpga_Status NiFpga_Download(NiFpga_Session session);
+
+/**
+ * Possible FPGA VI States that GetFpgaViState will output.
+ */
+typedef enum
+{
+   /**
+    * The FPGA VI has either been downloaded and not run, or the VI was aborted
+    * or reset.
+    */
+   NiFpga_FpgaViState_NotRunning = 0,
+   /**
+    * An error has occurred.
+    */
+   NiFpga_FpgaViState_Invalid = 1,
+   /**
+    * The FPGA VI is currently executing.
+    */
+   NiFpga_FpgaViState_Running = 2,
+   /**
+    * The FPGA VI stopped normally.  This indicates it was not aborted or reset,
+    * but instead reached the end of any loops it was executing and ended.
+    */
+   NiFpga_FpgaViState_NaturallyStopped = 3
+} NiFpga_FpgaViState;
+
+/**
+ * Get the current state of the FPGA VI on the target.
+ *
+ * @param session handle to a currently open session
+ * @param state the current state specified as NiFpga_FpgaViState
+ * @return result of the call
+ */
+NiFpga_Status NiFpga_GetFpgaViState(NiFpga_Session session,
+                                    uint32_t*      state);
 
 /**
  * @}
@@ -1168,6 +1541,21 @@ NiFpga_Status NiFpga_ReadDbl(NiFpga_Session session,
                              double*        value);
 
 /**
+ * Reads a FXP value with a wordlength greater than 32-bits from a given
+ * indicator or control.
+ *
+ * @param session handle to a currently open session
+ * @param indicator indicator or control from which to read
+ * @param typeInfo typeInfo from the generated FXP type
+ * @param value outputs the value that was read
+ * @return result of the call
+ */
+NiFpga_Status NiFpga_ReadFxp64(NiFpga_Session     session,
+                               uint32_t           indicator,
+                               NiFpga_FxpTypeInfo typeInfo,
+                               uint64_t*          value);
+
+/**
  * @}
  */
 
@@ -1308,6 +1696,21 @@ NiFpga_Status NiFpga_WriteSgl(NiFpga_Session session,
 NiFpga_Status NiFpga_WriteDbl(NiFpga_Session session,
                               uint32_t       control,
                               double         value);
+
+/**
+ * Writes a FXP value with a wordlength greater than 32-bits to a given
+ * indicator or control.
+ *
+ * @param session handle to a currently open session
+ * @param control control or indicator to which to write
+ * @param typeInfo typeInfo from the generated FXP type
+ * @param value value to write
+ * @return result of the call
+ */
+NiFpga_Status NiFpga_WriteFxp64(NiFpga_Session     session,
+                                uint32_t           control,
+                                NiFpga_FxpTypeInfo typeInfo,
+                                uint64_t           value);
 
 /**
  * @}
@@ -1894,7 +2297,7 @@ NiFpga_Status NiFpga_ConfigureFifo2(NiFpga_Session session,
 
 /**
  * FIFO Properties are only supported by certain RIO devices and is not
- * supported on Pharlap or VxWorks.
+ * supported on Pharlap.
  */
 #if NiFpga_Linux || NiFpga_Windows || NiFpga_MacOsX
 typedef enum
@@ -3579,6 +3982,100 @@ NiFpga_Status NiFpga_ReleaseFifoElements(NiFpga_Session session,
 NiFpga_Status NiFpga_GetPeerToPeerFifoEndpoint(NiFpga_Session session,
                                                uint32_t       fifo,
                                                uint32_t*      endpoint);
+
+/**
+ * Maps the write window of a peer-to-peer reader FIFO.
+ *
+ * The P2P reader expects linear accesses to the memory. This means that the
+ * libc memcpy is probably not safe and will cause out-of-order data writes.
+ *
+ * This memory may not be read from. Doing so could cause a bus hang on some
+ * targets. This includes reads issued by a debugger. Proceed with caution.
+ *
+ * This FIFO must be unmapped before a new FPGA image can be downloaded.
+ *
+ * @param session handle to a currently open session
+ * @param fifo peer-to-peer Sink FIFO
+ * @param size Outputs the size of the mapped region.
+ * @param virtualAddress Outputs the base address of the mapped region.
+ * @return result of the call
+ */
+NiFpga_Status NiFpga_MapP2PSinkFifo(const NiFpga_Session session,
+                                    const uint32_t       fifo,
+                                    size_t*              size,
+                                    void**               virtualAddress);
+
+/**
+ * Unmaps the write window of a peer-to-peer reader FIFO.
+ *
+ * @param session handle used to map the FIFO
+ * @param fifo peer-to-peer Sink FIFO
+ */
+NiFpga_Status NiFpga_UnmapP2PSinkFifo(const NiFpga_Session session,
+                                      const uint32_t       fifo);
+
+/**
+ * Open a Host Memory Buffer
+ *
+ * If the target supports creating a Host Memory Buffer, open the memory region
+ * mapped into the calling process.
+ *
+ * Call NiFpga_CloseHostMemoryBuffer to unmap and close the HMB.
+ *
+ * @param session handle to a currently open session
+ * @param memoryName Name given to the memory in the FPGA target
+ * @param memorySize Outputs the size of the mapped region.
+ * @param virtualAddress Outputs the base address of the mapped region.
+ * @return result of the call
+ */
+NiFpga_Status NiFpga_OpenHostMemoryBuffer(const NiFpga_Session session,
+                                          const char*          memoryName,
+                                          size_t*              memorySize,
+                                          void**               virtualAddress);
+
+/**
+ * Unmaps and closes the Host Memory Buffer
+ *
+ * @param session handle used to open the HMB
+ * @param memoryName Name given to the memory in the FPGA target
+ */
+NiFpga_Status NiFpga_CloseHostMemoryBuffer(const NiFpga_Session session,
+                                           const char*          memoryName);
+
+/**
+ * Open a Low Latency Buffer
+ *
+ * If the target supports creating a Low Latency Buffer, open the two memory
+ * regions mapped into the calling process.
+ *
+ * Each mapped memory space is unidirectional allowing posted writes in each
+ * direction for low-latency memory accesses between host and FPGA.
+ *
+ * Call NiFpga_CloseLowLatencyBuffer to unmap and close the LLB.
+ *
+ * @param session handle to a currently open session
+ * @param memoryName Name given to the memory in the FPGA target
+ * @param memorySizeToHost Outputs the size of the mapped region the FPGA writes to the Host.
+ * @param virtualAddressToHost Outputs the base address of the mapped region the FPGA writes to the Host.
+ * @param memorySizeToFpga Outputs the size of the mapped region the Host writes to the FPGA.
+ * @param virtualAddressToFpga Outputs the base address of the mapped region the Host writes to the FPGA.
+ * @return result of the call
+ */
+NiFpga_Status NiFpga_OpenLowLatencyBuffer(const NiFpga_Session session,
+                                          const char*          memoryName,
+                                          size_t*              memorySizeToHost,
+                                          void**               virtualAddressToHost,
+                                          size_t*              memorySizeToFpga,
+                                          void**               virtualAddressToFpga);
+
+/**
+ * Unmaps and closes the Low Latency Buffer
+ *
+ * @param session handle used to open the LLB
+ * @param memoryName Name given to the memory in the FPGA target
+ */
+NiFpga_Status NiFpga_CloseLowLatencyBuffer(const NiFpga_Session session,
+                                           const char*          memoryName);
 
 /**
  * @}
