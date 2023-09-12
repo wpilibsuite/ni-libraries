@@ -85,9 +85,9 @@ class FileDependencySet implements NativeDependencySet {
 }
 
 def netCommDependencySet = new FileDependencySet(project.files(
-    'src/lib/netcomm/libFRC_NetworkCommunication.so.23.0.0',
-    'src/lib/chipobject/libRoboRIO_FRC_ChipObject.so.23.0.0',
-    'src/lib/visa/libvisa.so.22.5.0'),
+    'src/lib/netcomm/libFRC_NetworkCommunication.so.24.0.0',
+    'src/lib/chipobject/libRoboRIO_FRC_ChipObject.so.24.0.0',
+    'src/lib/visa/libvisa.so.23.3.0'),
     project.files())
 
 model {
@@ -124,7 +124,7 @@ model {
             }
             binaries.all {
                 tasks.withType(LinkSharedLibrary) {
-                    installName = 'libnirio_emb_can.so.21'
+                    installName = 'libnirio_emb_can.so.23'
                 }
             }
         }
@@ -175,7 +175,7 @@ ext.addTaskToCopyAllOutputs = { task ->
     copyAllOutputs.from task.archivePath
 }
 
-def pubVersion = '2023.3.0'
+def pubVersion = '2024.1.0'
 
 def baseArtifactId = 'chipobject'
 def artifactGroupId = 'edu.wpi.first.ni-libraries'

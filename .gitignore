@@ -7,3 +7,4 @@ bin/
 .gradle/
 
 FRCNetComm.java
+.DS_Store
