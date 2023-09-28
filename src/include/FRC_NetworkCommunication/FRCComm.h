@@ -167,6 +167,7 @@ void EXPORT_FUNC FRC_NetworkCommunication_setNewTcpDataSem(pthread_cond_t*);
     int EXPORT_FUNC FRC_NetworkCommunication_setJoystickOutputs(uint8_t joystickNum, uint32_t hidOutputs, uint16_t leftRumble, uint16_t rightRumble);
     int EXPORT_FUNC FRC_NetworkCommunication_getJoystickDesc(uint8_t joystickNum, uint8_t* isXBox, uint8_t* type, char* name, uint8_t* axisCount, uint8_t* axisTypes, uint8_t* buttonCount, uint8_t* povCount);
     int EXPORT_FUNC FRC_NetworkCommunication_getPDPType(uint8_t* pdpType);
+    int EXPORT_FUNC FRC_NetworkCommunication_getTimeWasSet(uint8_t* timeWasSet);
 
     void EXPORT_FUNC FRC_NetworkCommunication_getVersionString(char* version);
     int EXPORT_FUNC FRC_NetworkCommunication_observeUserProgramStarting(void);
