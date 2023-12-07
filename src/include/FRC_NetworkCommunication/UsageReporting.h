@@ -122,6 +122,20 @@ typedef enum
     kResourceType_CTRE_future12,
     kResourceType_CTRE_future13, // 100
     kResourceType_CTRE_future14,
+    kResourceType_ExponentialProfile,
+    kResourceType_PS4Controller,
+    kResourceType_PhotonCamera,
+    kResourceType_PhotonPoseEstimator,
+    kResourceType_PathPlannerPath,
+    kResourceType_PathPlannerAuto,
+    kResourceType_PathFindingCommand,
+    kResourceType_Redux_future1,
+    kResourceType_Redux_future2, // 110
+    kResourceType_Redux_future3,
+    kResourceType_Redux_future4,
+    kResourceType_Redux_future5,
+    kResourceType_RevSparkFlexCAN,
+    kResourceType_RevSparkFlexPWM,
 } tResourceType;
 
 typedef enum
@@ -142,6 +156,7 @@ typedef enum
     kFramework_Timed = 4,
     kFramework_ROS = 5,
     kFramework_RobotBuilder = 6,
+    kFramework_AdvantageKit = 7,
 
     kRobotDrive_ArcadeStandard = 1,
     kRobotDrive_ArcadeButtonSpin = 2,
