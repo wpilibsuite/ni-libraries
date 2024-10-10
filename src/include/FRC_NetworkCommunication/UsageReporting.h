@@ -136,6 +136,8 @@ typedef enum
     kResourceType_Redux_future5,
     kResourceType_RevSparkFlexCAN,
     kResourceType_RevSparkFlexPWM,
+
+//    kResourceType_MaximumID = 255,
 } tResourceType;
 
 typedef enum
