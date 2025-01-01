@@ -4,7 +4,7 @@ plugins {
     id 'base'
     id 'maven-publish'
     id "com.jfrog.artifactory" version "4.29.3"
-    id 'edu.wpi.first.NativeUtils' version '2025.9.0'
+    id 'edu.wpi.first.NativeUtils' version '2025.3.0'
     id 'cpp'
     id 'c'
 }
