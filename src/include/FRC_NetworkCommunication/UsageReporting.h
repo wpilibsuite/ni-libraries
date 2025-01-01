@@ -136,6 +136,15 @@ typedef enum
     kResourceType_Redux_future5,
     kResourceType_RevSparkFlexCAN,
     kResourceType_RevSparkFlexPWM,
+    kResourceType_WPIlib_future1,
+    kResourceType_WPIlib_future2,
+    kResourceType_WPIlib_future3,
+    kResourceType_WPIlib_future4,
+    kResourceType_WPIlib_future5, // 120
+    kResourceType_WPIlib_future6,
+    kResourceType_WPIlib_future7,
+    kResourceType_WPIlib_future8,
+    kResourceType_Rev_ServoHub,
 
 //    kResourceType_MaximumID = 255,
 } tResourceType;
